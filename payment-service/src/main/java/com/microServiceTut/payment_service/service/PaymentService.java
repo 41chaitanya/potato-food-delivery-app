@@ -32,6 +32,7 @@ public class PaymentService {
             }
 
         }catch(Exception e){
+            e.printStackTrace();
             payment.setStatus(PaymentStatus.FAILED);
         }
         Payment savePayment = paymentRepository.save(payment);

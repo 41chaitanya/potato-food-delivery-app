@@ -53,6 +53,7 @@ public class OrderService {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             savedOrder.setStatus(OrderStatus.PAYMENT_FAILED);
         }
 

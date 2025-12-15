@@ -9,7 +9,7 @@ public class PaymentClient {
     private final WebClient webClient;
     public PaymentClient(WebClient.Builder builder) {
         this.webClient = builder
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://PAYMENT-SERVICE")
                 .build();
     }
 
