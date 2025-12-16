@@ -9,33 +9,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/microst
     username: postgres
     password: 1122334455
-    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-
-logging:
-  level:
-    root: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
 eureka:
   client:
     register-with-eureka: true
@@ -44,3 +24,46 @@ eureka:
       defaultZone: http://localhost:8761/eureka
   instance:
     hostname: localhost
+
+# ✅ RESILIENCE4J — ONLY HERE
+resilience4j:
+  circuitbreaker:
+    instances:
+      paymentCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+  retry:
+    instances:
+      paymentRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+
+  timelimiter:
+    instances:
+      paymentTimeLimiter:
+        timeoutDuration: 2s
+
+  ratelimiter:
+    instances:
+      paymentRateLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 10s
+
+  bulkhead:
+    instances:
+      paymentBulkhead:
+        maxConcurrentCalls: 3
+
+logging:
+  level:
+    io.github.resilience4j.circuitbreaker: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
