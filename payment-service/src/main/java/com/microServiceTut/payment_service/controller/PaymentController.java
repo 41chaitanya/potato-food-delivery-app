@@ -4,10 +4,9 @@ import com.microServiceTut.payment_service.dto.PaymentRequest;
 import com.microServiceTut.payment_service.dto.PaymentResponse;
 import com.microServiceTut.payment_service.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -19,4 +18,10 @@ public class PaymentController {
     public PaymentResponse makePayment(@RequestBody PaymentRequest paymentRequest) {
         return paymentService.processPayment(paymentRequest);
     }
+    @GetMapping("/order/{orderId}")
+    public PaymentResponse getPaymentAdmin(@PathVariable UUID orderId) {
+        return paymentService.getPaymentAdminByOrderId(orderId);
+    }
+
+
 }

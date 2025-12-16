@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PaymentService {
@@ -46,5 +48,14 @@ public class PaymentService {
     private boolean simulatePaymentGateway() {
 //       to fake payment failure 30 %
         return Math.random() > 0.3;
+    }
+
+    public PaymentResponse getPaymentAdminByOrderId(UUID orderId) {
+        Optional<Payment> paymentAdminByOrderId = paymentRepository.findPaymentAdminByOrderId(orderId);
+        return new PaymentResponse(
+          paymentAdminByOrderId.get().getOrderId(),
+          paymentAdminByOrderId.get().getStatus()
+
+        );
     }
 }
