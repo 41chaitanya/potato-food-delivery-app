@@ -2,6 +2,7 @@ package com.microServiceTut.order_service.service;
 
 import com.microServiceTut.order_service.client.PaymentClient;
 import com.microServiceTut.order_service.dto.CreateOrderRequest;
+import com.microServiceTut.order_service.dto.OrderBasicResponse;
 import com.microServiceTut.order_service.dto.OrderResponse;
 import com.microServiceTut.order_service.dto.PaymentRequest;
 import com.microServiceTut.order_service.dto.PaymentResponse;
@@ -11,9 +12,12 @@ import com.microServiceTut.order_service.model.PaymentStatus;
 import com.microServiceTut.order_service.repository.OrderRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class OrderService {
@@ -87,4 +91,38 @@ public OrderResponse paymentFallback(
             savedOrder.getTotalAmount()
     );
 }
+
+    /**
+     * Internal API for Delivery Service.
+     * Returns minimal order info needed for delivery assignment.
+     */
+    public OrderBasicResponse getOrderBasic(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+
+        return new OrderBasicResponse(
+                order.getId(),
+                order.getStatus().name(),
+                null  // restaurantId not available in current schema
+        );
+    }
+
+    /**
+     * Update order status
+     */
+    public OrderBasicResponse updateOrderStatus(UUID orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+
+        order.setStatus(OrderStatus.valueOf(status));
+        orderRepository.save(order);
+
+        return new OrderBasicResponse(
+                order.getId(),
+                order.getStatus().name(),
+                null
+        );
+    }
 }

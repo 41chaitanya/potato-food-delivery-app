@@ -5,9 +5,9 @@ spring:
     name: PAYMENT-SERVICE
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/microst
-    username: postgres
-    password: 1122334455
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:microst}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:changeme}
     driver-class-name: org.postgresql.Driver
 
   jpa:

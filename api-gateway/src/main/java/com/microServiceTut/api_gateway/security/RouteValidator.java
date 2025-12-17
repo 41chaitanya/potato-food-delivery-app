@@ -35,7 +35,8 @@ public class RouteValidator {
             "ADMIN", Set.of(
                     "/api/restaurants",
                     "/api/menus",
-                    "/api/orders"
+                    "/api/orders",
+                    "/api/delivery"    // Admin can assign deliveries
             ),
             "RIDER", Set.of(
                     "/api/delivery",

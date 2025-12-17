@@ -39,9 +39,14 @@ spring:
           predicates:
             - Path=/api/cart/**
 
+        - id: delivery-service
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/api/delivery/**
+
 # JWT Configuration - MUST match User-Auth-Service secret
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
+  secret: ${JWT_SECRET:changeme_use_env_variable}
 
 eureka:
   client:

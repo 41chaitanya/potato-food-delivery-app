@@ -1,0 +1,278 @@
+# 🍕 Food Delivery Microservices Platform
+
+A production-ready food delivery backend built with Spring Boot Microservices architecture.
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+                                    ┌─────────────────┐
+                                    │  Service        │
+                                    │  Registry       │
+                                    │  (Eureka)       │
+                                    │  Port: 8761     │
+                                    └────────┬────────┘
+                                             │
+                    ┌────────────────────────┼────────────────────────┐
+                    │                        │                        │
+                    ▼                        ▼                        ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           API Gateway (Port: 8080)                          │
+│                    JWT Authentication + Route Management                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                    │
+    ┌───────────────┼───────────────┬───────────────┬───────────────┐
+    │               │               │               │               │
+    ▼               ▼               ▼               ▼               ▼
+┌────────┐    ┌────────┐    ┌────────┐    ┌────────┐    ┌────────┐
+│  User  │    │Restaurant│   │  Menu  │    │  Cart  │    │ Order  │
+│  Auth  │    │ Service │    │Service │    │Service │    │Service │
+│  8086  │    │  8083   │    │  8084  │    │  8085  │    │  8081  │
+└────────┘    └────────┘    └────────┘    └────────┘    └───┬────┘
+                                                            │
+                                          ┌─────────────────┼─────────────────┐
+                                          ▼                                   ▼
+                                    ┌────────┐                          ┌────────┐
+                                    │Payment │                          │Delivery│
+                                    │Service │                          │Service │
+                                    │  8082  │                          │  8087  │
+                                    └────────┘                          └────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Java | 21 | Programming Language |
+| Spring Boot | 3.5.x | Application Framework |
+| Spring Cloud | 2025.0.0 | Microservices Tools |
+| PostgreSQL | 12+ | Database |
+| Netflix Eureka | - | Service Discovery |
+| Spring Cloud Gateway | - | API Gateway |
+| JWT | - | Authentication |
+| Resilience4j | - | Circuit Breaker |
+| Lombok | 1.18.34 | Boilerplate Reduction |
+| Maven | 3.9+ | Build Tool |
+
+---
+
+## 📦 Services
+
+| Service | Port | Description | Status |
+|---------|------|-------------|--------|
+| Service Registry | 8761 | Eureka Server - Service Discovery | ✅ Active |
+| API Gateway | 8080 | Entry point, JWT validation, routing | ✅ Active |
+| User Auth Service | 8086 | User registration, login, JWT tokens | ✅ Active |
+| Restaurant Service | 8083 | Restaurant CRUD operations | ✅ Active |
+| Menu Service | 8084 | Menu items management | ✅ Active |
+| Cart Service | 8085 | Shopping cart management | ✅ Active |
+| Order Service | 8081 | Order processing with payment | ✅ Active |
+| Payment Service | 8082 | Payment processing (mock) | ✅ Active |
+| Delivery Service | 8087 | Delivery & rider management | ✅ Active |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Java 21 or higher
+- Maven 3.9+
+- PostgreSQL 12+
+- Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/your-username/food-delivery-microservices.git
+cd food-delivery-microservices
+```
+
+### Database Setup
+
+Create the database in PostgreSQL:
+
+```sql
+CREATE DATABASE microst;
+```
+
+---
+
+## ⚙️ Environment Setup
+
+### 1. Create Environment File
+
+```bash
+cp .env.example .env
+```
+
+### 2. Update `.env` with your credentials
+
+```properties
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=microst
+DB_USERNAME=postgres
+DB_PASSWORD=your_password_here
+
+# JWT (Change in production!)
+JWT_SECRET=your_super_secret_key_minimum_32_characters_long
+JWT_EXPIRATION=86400000
+```
+
+### 3. Configure IntelliJ IDEA
+
+For each service:
+1. Open **Run Configuration**
+2. Go to **Environment Variables**
+3. Click **"..."** → **Load from file**
+4. Select `.env` file from project root
+
+---
+
+## ▶️ Running the Project
+
+### Start Order (Important!)
+
+Start services in this order:
+
+```bash
+# 1. Service Registry (Start First!)
+cd service-registry
+./mvnw spring-boot:run
+
+# 2. Other Services (Any Order)
+cd user-auth-service && ./mvnw spring-boot:run
+cd restaurant-service && ./mvnw spring-boot:run
+cd menu-service && ./mvnw spring-boot:run
+cd cart-service && ./mvnw spring-boot:run
+cd payment-service && ./mvnw spring-boot:run
+cd order-service && ./mvnw spring-boot:run
+cd delivery-service && ./mvnw spring-boot:run
+
+# 3. API Gateway (Start Last!)
+cd api-gateway && ./mvnw spring-boot:run
+```
+
+### Verify Services
+
+- Eureka Dashboard: http://localhost:8761
+- API Gateway: http://localhost:8080
+
+---
+
+## 📡 API Documentation
+
+### Authentication
+
+All endpoints (except `/auth/*`) require JWT token in header:
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+### Role-Based Access
+
+| Role | Access |
+|------|--------|
+| `ADMIN` | Restaurant, Menu, Delivery assignment |
+| `USER` | Cart, Orders, View restaurants/menus |
+| `RIDER` | Delivery pickup & deliver |
+
+### Base URLs
+
+| Service | Direct URL | Via Gateway |
+|---------|------------|-------------|
+| Auth | http://localhost:8086 | http://localhost:8080/auth |
+| Restaurant | http://localhost:8083 | http://localhost:8080/api/restaurants |
+| Menu | http://localhost:8084 | http://localhost:8080/api/menus |
+| Cart | http://localhost:8085 | http://localhost:8080/api/cart |
+| Order | http://localhost:8081 | http://localhost:8080/api/orders |
+| Delivery | http://localhost:8087 | http://localhost:8080/api/delivery |
+
+---
+
+## 📁 Project Structure
+
+```
+food-delivery-microservices/
+├── .env.example              # Environment template
+├── .gitignore                # Git ignore rules
+├── README.md                 # This file
+│
+├── service-registry/         # Eureka Server
+├── api-gateway/              # API Gateway + JWT
+├── user-auth-service/        # Authentication
+├── restaurant-service/       # Restaurant management
+├── menu-service/             # Menu management
+├── cart-service/             # Shopping cart
+├── order-service/            # Order processing
+├── payment-service/          # Payment processing
+└── delivery-service/         # Delivery management
+```
+
+### Service Structure (Each Service)
+
+```
+service-name/
+├── src/main/java/com/microServiceTut/service_name/
+│   ├── controller/           # REST Controllers
+│   ├── service/              # Business Logic
+│   ├── repository/           # Data Access
+│   ├── model/                # Entity Classes
+│   ├── dto/
+│   │   ├── request/          # Request DTOs
+│   │   └── response/         # Response DTOs
+│   ├── mapper/               # Entity-DTO Mappers
+│   ├── exception/            # Custom Exceptions
+│   ├── config/               # Configuration
+│   └── client/               # Feign/WebClient
+├── src/main/resources/
+│   └── application.yaml      # Configuration
+└── pom.xml                   # Dependencies
+```
+
+---
+
+## 🤝 Contributing
+
+### Setup for Contributors
+
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/your-username/food-delivery-microservices.git
+   ```
+3. Create `.env` file from `.env.example`
+4. Create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+5. Make changes and commit:
+   ```bash
+   git commit -m "feat: add your feature"
+   ```
+6. Push and create Pull Request
+
+### Coding Standards
+
+- Use constructor injection (no `@Autowired` on fields)
+- Return DTOs from controllers (never entities)
+- Use `@Transactional` for database operations
+- Follow existing package structure
+- Add proper logging
+
+---
+
+## 📄 License
+
+This project is for educational purposes.
+
+---
+
+## 👨‍💻 Author
+
+Built with ❤️ for learning microservices architecture.
