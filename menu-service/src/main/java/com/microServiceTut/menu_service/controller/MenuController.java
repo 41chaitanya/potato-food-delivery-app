@@ -2,6 +2,7 @@ package com.microServiceTut.menu_service.controller;
 
 import com.microServiceTut.menu_service.dto.request.CreateMenuItemRequest;
 import com.microServiceTut.menu_service.dto.request.UpdateMenuItemRequest;
+import com.microServiceTut.menu_service.dto.response.MenuItemInternalResponse;
 import com.microServiceTut.menu_service.dto.response.MenuItemResponse;
 import com.microServiceTut.menu_service.model.MealType;
 import com.microServiceTut.menu_service.service.MenuService;
@@ -54,5 +55,11 @@ public class MenuController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void softDeleteMenuItem(@PathVariable UUID menuItemId) {
         menuService.softDeleteMenuItem(menuItemId);
+    }
+
+    // Internal API for Cart Service
+    @GetMapping("/internal/{menuItemId}")
+    public MenuItemInternalResponse getMenuItemInternal(@PathVariable UUID menuItemId) {
+        return menuService.getMenuItemInternal(menuItemId);
     }
 }

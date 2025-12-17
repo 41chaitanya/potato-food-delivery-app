@@ -4,6 +4,7 @@ import com.microServiceTut.menu_service.client.RestaurantClient;
 import com.microServiceTut.menu_service.client.dto.RestaurantInternalResponse;
 import com.microServiceTut.menu_service.dto.request.CreateMenuItemRequest;
 import com.microServiceTut.menu_service.dto.request.UpdateMenuItemRequest;
+import com.microServiceTut.menu_service.dto.response.MenuItemInternalResponse;
 import com.microServiceTut.menu_service.dto.response.MenuItemResponse;
 import com.microServiceTut.menu_service.exception.MenuItemNotFoundException;
 import com.microServiceTut.menu_service.exception.RestaurantNotActiveException;
@@ -77,6 +78,12 @@ public class MenuServiceImpl implements MenuService {
         menuItem.setStatus(MenuStatus.INACTIVE);
         menuItem.setAvailable(false);
         menuItemRepository.save(menuItem);
+    }
+
+    @Override
+    public MenuItemInternalResponse getMenuItemInternal(UUID menuItemId) {
+        MenuItem menuItem = findMenuItemOrThrow(menuItemId);
+        return MenuMapper.toInternalResponse(menuItem);
     }
 
     private void validateRestaurant(UUID restaurantId) {

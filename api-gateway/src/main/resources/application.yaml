@@ -8,6 +8,12 @@ spring:
   cloud:
     gateway:
       routes:
+        # Auth Service - PUBLIC (no JWT required)
+        - id: auth-service
+          uri: lb://USER-AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
@@ -28,9 +34,22 @@ spring:
           predicates:
             - Path=/api/restaurants/**
 
+        - id: cart-service
+          uri: lb://CART-SERVICE
+          predicates:
+            - Path=/api/cart/**
+
+# JWT Configuration - MUST match User-Auth-Service secret
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
+
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    com.microServiceTut.api_gateway: DEBUG

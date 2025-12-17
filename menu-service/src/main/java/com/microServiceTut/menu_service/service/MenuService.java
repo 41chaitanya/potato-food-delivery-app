@@ -2,6 +2,7 @@ package com.microServiceTut.menu_service.service;
 
 import com.microServiceTut.menu_service.dto.request.CreateMenuItemRequest;
 import com.microServiceTut.menu_service.dto.request.UpdateMenuItemRequest;
+import com.microServiceTut.menu_service.dto.response.MenuItemInternalResponse;
 import com.microServiceTut.menu_service.dto.response.MenuItemResponse;
 import com.microServiceTut.menu_service.model.MealType;
 
@@ -21,4 +22,6 @@ public interface MenuService {
     MenuItemResponse updateMenuItem(UUID menuItemId, UpdateMenuItemRequest request);
 
     void softDeleteMenuItem(UUID menuItemId);
+
+    MenuItemInternalResponse getMenuItemInternal(UUID menuItemId);
 }

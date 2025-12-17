@@ -2,6 +2,7 @@ package com.microServiceTut.menu_service.mapper;
 
 import com.microServiceTut.menu_service.dto.request.CreateMenuItemRequest;
 import com.microServiceTut.menu_service.dto.request.UpdateMenuItemRequest;
+import com.microServiceTut.menu_service.dto.response.MenuItemInternalResponse;
 import com.microServiceTut.menu_service.dto.response.MenuItemResponse;
 import com.microServiceTut.menu_service.model.MenuItem;
 import com.microServiceTut.menu_service.model.MenuStatus;
@@ -62,5 +63,14 @@ public final class MenuMapper {
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())
                 .build();
+    }
+
+    public static MenuItemInternalResponse toInternalResponse(MenuItem item) {
+        return new MenuItemInternalResponse(
+                item.getId(),
+                item.getRestaurantId(),
+                item.getPrice(),
+                item.isAvailable()
+        );
     }
 }
