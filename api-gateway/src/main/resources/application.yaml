@@ -23,6 +23,11 @@ spring:
           predicates:
             - Path=/api/menus/**
 
+        - id: restaurant-service
+          uri: lb://RESTAURANT-SERVICE
+          predicates:
+            - Path=/api/restaurants/**
+
 eureka:
   client:
     register-with-eureka: true

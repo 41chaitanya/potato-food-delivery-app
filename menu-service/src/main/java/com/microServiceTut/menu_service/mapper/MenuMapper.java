@@ -5,8 +5,11 @@ import com.microServiceTut.menu_service.dto.request.UpdateMenuItemRequest;
 import com.microServiceTut.menu_service.dto.response.MenuItemResponse;
 import com.microServiceTut.menu_service.model.MenuItem;
 import com.microServiceTut.menu_service.model.MenuStatus;
+import com.microServiceTut.menu_service.model.OccasionType;
 
-public class MenuMapper {
+public final class MenuMapper {
+
+    private MenuMapper() {}
 
     public static MenuItem toEntity(CreateMenuItemRequest request) {
         return MenuItem.builder()
@@ -14,9 +17,35 @@ public class MenuMapper {
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
-                .available(true)
+                .mealType(request.getMealType())
+                .occasionType(request.getOccasionType() != null ? request.getOccasionType() : OccasionType.REGULAR)
                 .status(MenuStatus.ACTIVE)
+                .available(true)
                 .build();
+    }
+
+    public static void updateEntity(MenuItem entity, UpdateMenuItemRequest request) {
+        if (request.getName() != null) {
+            entity.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            entity.setDescription(request.getDescription());
+        }
+        if (request.getPrice() != null) {
+            entity.setPrice(request.getPrice());
+        }
+        if (request.getMealType() != null) {
+            entity.setMealType(request.getMealType());
+        }
+        if (request.getOccasionType() != null) {
+            entity.setOccasionType(request.getOccasionType());
+        }
+        if (request.getStatus() != null) {
+            entity.setStatus(request.getStatus());
+        }
+        if (request.getAvailable() != null) {
+            entity.setAvailable(request.getAvailable());
+        }
     }
 
     public static MenuItemResponse toResponse(MenuItem item) {
@@ -26,26 +55,12 @@ public class MenuMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .price(item.getPrice())
-                .available(item.isAvailable())
+                .mealType(item.getMealType())
+                .occasionType(item.getOccasionType())
                 .status(item.getStatus())
+                .available(item.isAvailable())
                 .createdAt(item.getCreatedAt())
+                .updatedAt(item.getUpdatedAt())
                 .build();
     }
-    public static void updateEntity(MenuItem entity, UpdateMenuItemRequest request) {
-
-        if (request.getName() != null) {
-            entity.setName(request.getName());
-        }
-
-        if (request.getDescription() != null) {
-            entity.setDescription(request.getDescription());
-        }
-
-        if (request.getPrice() != null) {
-            entity.setPrice(request.getPrice());
-        }
-
-
-    }
-
 }

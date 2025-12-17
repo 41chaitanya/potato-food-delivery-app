@@ -1,9 +1,9 @@
 server:
-  port: 8084
+  port: 8083
 
 spring:
   application:
-    name: MENU-SERVICE
+    name: RESTAURANT-SERVICE
 
   datasource:
     url: jdbc:postgresql://localhost:5432/microst
@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update     # dev only (prod me validate)
     show-sql: true
     open-in-view: false
     properties:

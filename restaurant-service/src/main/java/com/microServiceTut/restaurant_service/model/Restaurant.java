@@ -1,53 +1,45 @@
-package com.microServiceTut.menu_service.model;
+package com.microServiceTut.restaurant_service.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "menu_items")
+@Table(name = "restaurants")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MenuItem {
+public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID restaurantId;
-
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(length = 500)
-    private String description;
+    @Column(nullable = false, length = 255)
+    private String address;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MealType mealType;
+    @Column(length = 20)
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OccasionType occasionType;
+    private CuisineType cuisineType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MenuStatus status;
+    private RestaurantStatus status;
 
     @Column(nullable = false)
-    private boolean available;
+    private boolean active;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

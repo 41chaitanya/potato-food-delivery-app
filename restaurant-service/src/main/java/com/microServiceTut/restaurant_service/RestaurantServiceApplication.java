@@ -1,4 +1,4 @@
-package com.microServiceTut.menu_service;
+package com.microServiceTut.restaurant_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,9 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class MenuServiceApplication {
+public class RestaurantServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MenuServiceApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(RestaurantServiceApplication.class, args);
+	}
+
 }

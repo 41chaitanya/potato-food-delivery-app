@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.microServiceTut</groupId>
-	<artifactId>menu-service</artifactId>
+	<artifactId>restaurant-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>menu-service</name>
-	<description>menue service</description>
+	<name>restaurant-service</name>
+	<description>resturent dervice</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -50,10 +50,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 
 		<dependency>
