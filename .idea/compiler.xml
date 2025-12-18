@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
+        <module name="config-server" />
         <module name="service-registry" />
       </profile>
       <profile name="Annotation profile for cart-service" enabled="true">
@@ -29,16 +30,16 @@
         <module name="delivery-service" />
         <module name="user-auth-service" />
       </profile>
-      <profile name="Annotation profile for admin-service" enabled="true">
+      <profile name="Annotation profile for payment-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="restaurant-service" />
         <module name="payment-service" />
         <module name="order-service" />
+        <module name="restaurant-service" />
         <module name="menu-service" />
         <module name="admin-service" />
       </profile>
@@ -53,6 +54,7 @@
       <module name="api-gateway" options="-parameters" />
       <module name="auth-service" options="-parameters" />
       <module name="cart-service" options="-parameters" />
+      <module name="config-server" options="-parameters" />
       <module name="delivery-service" options="-parameters" />
       <module name="menu-service" options="-parameters" />
       <module name="order-service" options="-parameters" />

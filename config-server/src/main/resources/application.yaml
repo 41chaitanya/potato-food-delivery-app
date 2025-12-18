@@ -1,0 +1,77 @@
+# ============================================================================
+# SPRING CLOUD CONFIG SERVER - CENTRALIZED CONFIGURATION
+# ============================================================================
+# Profiles:
+#   - native (default): Local file system for development
+#   - git: GitHub repository for staging/production
+# ============================================================================
+
+server:
+  port: 8089
+
+spring:
+  application:
+    name: CONFIG-SERVER
+
+  profiles:
+    active: native
+
+  cloud:
+    config:
+      server:
+        # =================================================================
+        # NATIVE PROFILE - LOCAL FILE SYSTEM (Development)
+        # =================================================================
+        native:
+          search-locations:
+            - file:./config-repo
+            - file:./config-repo/{application}
+
+        # =================================================================
+        # GIT PROFILE - GITHUB REPOSITORY (Staging/Production)
+        # =================================================================
+        git:
+          uri: ${CONFIG_GIT_URI:https://github.com/your-org/microservice-config.git}
+          default-label: ${CONFIG_GIT_BRANCH:main}
+          clone-on-start: true
+          timeout: 10
+          force-pull: true
+          search-paths:
+            - '{application}'
+            - 'shared'
+          username: ${CONFIG_GIT_USERNAME:}
+          password: ${CONFIG_GIT_PASSWORD:}
+
+# =============================================================================
+# EUREKA CLIENT CONFIGURATION
+# =============================================================================
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# =============================================================================
+# ACTUATOR ENDPOINTS
+# =============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,refresh
+  endpoint:
+    health:
+      show-details: always
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level:
+    org.springframework.cloud.config: INFO
+    com.netflix.discovery: WARN

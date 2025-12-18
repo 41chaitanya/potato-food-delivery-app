@@ -1,13 +1,16 @@
 server:
   port: 8082
+
 spring:
   application:
     name: PAYMENT-SERVICE
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8089}
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:microst}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${PAYMENT_DB:payment_db}
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:changeme}
+    password: ${DB_PASSWORD:1122334455}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -15,10 +18,15 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
 
   jackson:
     serialization:
@@ -35,6 +43,7 @@ management:
     web:
       exposure:
         include: health,info
+
 eureka:
   client:
     register-with-eureka: true

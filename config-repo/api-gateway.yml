@@ -1,18 +1,19 @@
+# ============================================================================
+# API-GATEWAY SERVICE CONFIGURATION
+# ============================================================================
+
 server:
   port: 8080
 
 spring:
   application:
     name: API-GATEWAY
-  config:
-    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8089}
 
   cloud:
     gateway:
       server:
         webflux:
           routes:
-            # Auth Service - PUBLIC (no JWT required)
             - id: auth-service
               uri: lb://USER-AUTH-SERVICE
               predicates:
@@ -53,16 +54,8 @@ spring:
               predicates:
                 - Path=/api/admin/**
 
-# JWT Configuration - MUST match User-Auth-Service secret
 jwt:
   secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
 
 logging:
   level:

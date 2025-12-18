@@ -1,0 +1,59 @@
+# ============================================================================
+# SHARED CONFIGURATION - Applied to ALL services
+# ============================================================================
+# This file contains common configuration shared across all microservices.
+# Service-specific configs override these values.
+# ============================================================================
+
+# Common Database Configuration
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+# Common Eureka Configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+
+# Common Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# Common Logging
+logging:
+  level:
+    root: INFO
+    com.microServiceTut: DEBUG
+    org.hibernate.SQL: WARN

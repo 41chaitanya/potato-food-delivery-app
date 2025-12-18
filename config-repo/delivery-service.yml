@@ -1,0 +1,30 @@
+# ============================================================================
+# DELIVERY-SERVICE CONFIGURATION
+# ============================================================================
+
+server:
+  port: 8087
+
+spring:
+  application:
+    name: DELIVERY-SERVICE
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DELIVERY_DB:delivery_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:1122334455}
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    defer-datasource-initialization: true
+
+# Max active deliveries per rider
+delivery:
+  max-active-per-rider: 5
+
+logging:
+  level:
+    com.microServiceTut.delivery_service: DEBUG
