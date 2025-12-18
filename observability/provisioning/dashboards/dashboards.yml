@@ -1,0 +1,17 @@
+# ============================================================================
+# GRAFANA DASHBOARD PROVISIONING
+# ============================================================================
+# Auto-loads dashboards from the dashboards folder.
+# ============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: 'Food Delivery Logs'
+    orgId: 1
+    folder: 'Microservices'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

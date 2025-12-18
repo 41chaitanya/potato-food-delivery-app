@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================================
+     LOGBACK CONFIGURATION - Grafana Cloud Loki Integration
+     ============================================================================ -->
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- ========================================================================
+         PROPERTIES - From Spring Environment
+         ======================================================================== -->
+    <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="unknown-service"/>
+    <springProperty scope="context" name="LOKI_URL" source="loki.url" defaultValue="https://logs-prod-028.grafana.net"/>
+    <springProperty scope="context" name="LOKI_USER" source="loki.user" defaultValue="1431940"/>
+    <springProperty scope="context" name="LOKI_PASSWORD" source="loki.password" defaultValue=""/>
+
+    <!-- ========================================================================
+         CONSOLE APPENDER - Human-readable format
+         ======================================================================== -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [${SERVICE_NAME}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ========================================================================
+         LOKI APPENDER - Direct to Grafana Cloud
+         ======================================================================== -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL}/loki/api/v1/push</url>
+            <auth>
+                <username>${LOKI_USER}</username>
+                <password>${LOKI_PASSWORD}</password>
+            </auth>
+        </http>
+        <format>
+            <label>
+                <pattern>service=${SERVICE_NAME},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>{"timestamp":"%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}","level":"%level","service":"${SERVICE_NAME}","class":"%logger{36}","thread":"%thread","message":"%msg"}</pattern>
+            </message>
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
+
+    <!-- ========================================================================
+         JSON APPENDER - For local Loki via Promtail (docker profile)
+         ======================================================================== -->
+    <appender name="JSON_SIMPLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>{"timestamp":"%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}","level":"%level","service":"${SERVICE_NAME}","class":"%logger{36}","thread":"%thread","message":"%msg"}%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ========================================================================
+         DEFAULT PROFILE - Console + Loki (local development with cloud logging)
+         ======================================================================== -->
+    <springProfile name="default,local,dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+        <logger name="com.microServiceTut" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </logger>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="com.netflix" level="WARN"/>
+        <logger name="com.github.loki4j" level="DEBUG"/>
+    </springProfile>
+
+    <!-- ========================================================================
+         DOCKER PROFILE - JSON output for local Loki via Promtail
+         ======================================================================== -->
+    <springProfile name="docker">
+        <root level="INFO">
+            <appender-ref ref="JSON_SIMPLE"/>
+        </root>
+        <logger name="com.microServiceTut" level="DEBUG" additivity="false">
+            <appender-ref ref="JSON_SIMPLE"/>
+        </logger>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="com.netflix" level="WARN"/>
+    </springProfile>
+
+    <!-- ========================================================================
+         CLOUD PROFILE - Console + Grafana Cloud Loki (direct push)
+         ======================================================================== -->
+    <springProfile name="cloud,prod,production">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+        <logger name="com.microServiceTut" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </logger>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="com.netflix" level="WARN"/>
+        <logger name="com.github.loki4j" level="DEBUG"/>
+    </springProfile>
+
+</configuration>

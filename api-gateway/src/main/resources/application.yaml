@@ -67,3 +67,25 @@ eureka:
 logging:
   level:
     com.microServiceTut.api_gateway: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# Distributed Tracing Configuration
+management:
+  tracing:
+    sampling:
+      probability: 0.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
+
+# Grafana Cloud Loki Configuration
+loki:
+  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
+  user: ${LOKI_USER:1431940}
+  password: ${LOKI_PASSWORD:}
+
+
+
+
+

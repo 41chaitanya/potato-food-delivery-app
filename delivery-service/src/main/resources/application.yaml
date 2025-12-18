@@ -49,8 +49,27 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
+  tracing:
+    sampling:
+      probability: 0.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
 
 logging:
   level:
     com.microServiceTut.delivery_service: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# Grafana Cloud Loki Configuration
+loki:
+  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
+  user: ${LOKI_USER:1431940}
+  password: ${LOKI_PASSWORD:}
+
+
+
+
+

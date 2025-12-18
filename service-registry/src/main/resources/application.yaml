@@ -7,3 +7,13 @@ eureka:
     fetch-registry: false
 server:
   port: 8761
+# Grafana Cloud Loki Configuration
+loki:
+  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
+  user: ${LOKI_USER:1431940}
+  password: ${LOKI_PASSWORD:}
+
+
+
+
+

@@ -46,14 +46,31 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0  # 100% sampling for development
 
-# Common Logging
+# Distributed Tracing - Zipkin/Tempo Configuration
+zipkin:
+  url: ${ZIPKIN_URL:http://localhost:9411}
+  user: ${ZIPKIN_USER:}
+  password: ${ZIPKIN_PASSWORD:}
+
+# Common Logging with TraceId
 logging:
   level:
     root: INFO
     com.microServiceTut: DEBUG
     org.hibernate.SQL: WARN
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# Grafana Cloud Loki Configuration
+loki:
+  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
+  user: ${LOKI_USER:}
+  password: ${LOKI_PASSWORD:}
