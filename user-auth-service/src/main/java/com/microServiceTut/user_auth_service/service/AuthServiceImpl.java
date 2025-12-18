@@ -2,11 +2,14 @@ package com.microServiceTut.user_auth_service.service;
 
 import com.microServiceTut.user_auth_service.dto.request.LoginRequest;
 import com.microServiceTut.user_auth_service.dto.request.RegisterRequest;
+import com.microServiceTut.user_auth_service.dto.request.UpdateProfileRequest;
 import com.microServiceTut.user_auth_service.dto.response.AuthResponse;
 import com.microServiceTut.user_auth_service.dto.response.TokenValidationResponse;
+import com.microServiceTut.user_auth_service.dto.response.UserProfileResponse;
 import com.microServiceTut.user_auth_service.exception.InvalidCredentialsException;
 import com.microServiceTut.user_auth_service.exception.UserAlreadyExistsException;
 import com.microServiceTut.user_auth_service.exception.UserNotActiveException;
+import com.microServiceTut.user_auth_service.exception.UserNotFoundException;
 import com.microServiceTut.user_auth_service.mapper.UserMapper;
 import com.microServiceTut.user_auth_service.model.Role;
 import com.microServiceTut.user_auth_service.model.User;
@@ -90,5 +93,76 @@ public class AuthServiceImpl implements AuthService {
                 .email(email)
                 .role(role)
                 .build();
+    }
+
+    @Override
+    public UserProfileResponse getProfile(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        return UserMapper.toProfileResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UserProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress());
+        }
+
+        User updated = userRepository.save(user);
+        return UserMapper.toProfileResponse(updated);
+    }
+
+    // ==================== ADMIN ENDPOINTS ====================
+
+    @Override
+    public java.util.List<UserProfileResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    public java.util.List<UserProfileResponse> getUsersByRole(String role) {
+        return userRepository.findByRole(Role.valueOf(role.toUpperCase())).stream()
+                .map(UserMapper::toProfileResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public UserProfileResponse blockUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        user.setActive(false);
+        return UserMapper.toProfileResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public UserProfileResponse unblockUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        user.setActive(true);
+        return UserMapper.toProfileResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserStatsResponse getUserStats() {
+        long total = userRepository.count();
+        long active = userRepository.countByActiveTrue();
+        long blocked = userRepository.countByActiveFalse();
+        long admins = userRepository.countByRole(Role.ADMIN);
+        long riders = userRepository.countByRole(Role.RIDER);
+        return new UserStatsResponse(total, active, blocked, admins, riders);
     }
 }

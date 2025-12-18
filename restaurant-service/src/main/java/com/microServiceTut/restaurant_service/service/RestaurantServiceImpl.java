@@ -64,6 +64,23 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @Transactional
+    public RestaurantResponse toggleRestaurantStatus(UUID restaurantId) {
+        Restaurant restaurant = findRestaurantOrThrow(restaurantId);
+        
+        if (restaurant.getStatus() == RestaurantStatus.ACTIVE) {
+            restaurant.setStatus(RestaurantStatus.CLOSED);
+            restaurant.setActive(false);
+        } else {
+            restaurant.setStatus(RestaurantStatus.ACTIVE);
+            restaurant.setActive(true);
+        }
+        
+        Restaurant updated = restaurantRepository.save(restaurant);
+        return RestaurantMapper.toResponse(updated);
+    }
+
+    @Override
     public RestaurantInternalResponse getRestaurantInternal(UUID restaurantId) {
         Restaurant restaurant = findRestaurantOrThrow(restaurantId);
         return RestaurantMapper.toInternalResponse(restaurant);
@@ -72,5 +89,48 @@ public class RestaurantServiceImpl implements RestaurantService {
     private Restaurant findRestaurantOrThrow(UUID restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RestaurantNotFoundException(restaurantId));
+    }
+
+    // ==================== ADMIN ENDPOINTS ====================
+
+    @Override
+    public List<RestaurantResponse> getAllRestaurants() {
+        return restaurantRepository.findAll().stream()
+                .map(RestaurantMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<RestaurantResponse> getPendingRestaurants() {
+        return restaurantRepository.findByStatus(RestaurantStatus.PENDING).stream()
+                .map(RestaurantMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public RestaurantResponse approveRestaurant(UUID restaurantId) {
+        Restaurant restaurant = findRestaurantOrThrow(restaurantId);
+        restaurant.setStatus(RestaurantStatus.ACTIVE);
+        restaurant.setActive(true);
+        return RestaurantMapper.toResponse(restaurantRepository.save(restaurant));
+    }
+
+    @Override
+    @Transactional
+    public RestaurantResponse rejectRestaurant(UUID restaurantId) {
+        Restaurant restaurant = findRestaurantOrThrow(restaurantId);
+        restaurant.setStatus(RestaurantStatus.REJECTED);
+        restaurant.setActive(false);
+        return RestaurantMapper.toResponse(restaurantRepository.save(restaurant));
+    }
+
+    @Override
+    public RestaurantStatsResponse getRestaurantStats() {
+        long total = restaurantRepository.count();
+        long active = restaurantRepository.countByStatus(RestaurantStatus.ACTIVE);
+        long pending = restaurantRepository.countByStatus(RestaurantStatus.PENDING);
+        long rejected = restaurantRepository.countByStatus(RestaurantStatus.REJECTED);
+        return new RestaurantStatsResponse(total, active, pending, rejected);
     }
 }

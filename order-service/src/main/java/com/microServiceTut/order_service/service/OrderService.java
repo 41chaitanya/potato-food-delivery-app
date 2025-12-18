@@ -1,11 +1,7 @@
 package com.microServiceTut.order_service.service;
 
 import com.microServiceTut.order_service.client.PaymentClient;
-import com.microServiceTut.order_service.dto.CreateOrderRequest;
-import com.microServiceTut.order_service.dto.OrderBasicResponse;
-import com.microServiceTut.order_service.dto.OrderResponse;
-import com.microServiceTut.order_service.dto.PaymentRequest;
-import com.microServiceTut.order_service.dto.PaymentResponse;
+import com.microServiceTut.order_service.dto.*;
 import com.microServiceTut.order_service.model.Order;
 import com.microServiceTut.order_service.model.OrderStatus;
 import com.microServiceTut.order_service.model.PaymentStatus;
@@ -17,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,6 +30,7 @@ public class OrderService {
 
         // 1. Create order
         Order order = new Order();
+        order.setUserId(createOrderRequest.getUserId());
         order.setCustomerName(createOrderRequest.getCustomerName());
         order.setRestaurantName(createOrderRequest.getRestaurantName());
         order.setTotalAmount(createOrderRequest.getTotalAmount());
@@ -125,4 +123,72 @@ public OrderResponse paymentFallback(
                 null
         );
     }
+
+    /**
+     * Get order by ID
+     */
+    public OrderDetailResponse getOrderById(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+
+        return toDetailResponse(order);
+    }
+
+    /**
+     * Get order history for user
+     */
+    public List<OrderDetailResponse> getOrderHistory(UUID userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::toDetailResponse)
+                .toList();
+    }
+
+    /**
+     * Cancel order
+     */
+    public OrderDetailResponse cancelOrder(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+
+        // Can only cancel if not delivered
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel delivered order");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        Order saved = orderRepository.save(order);
+
+        return toDetailResponse(saved);
+    }
+
+    private OrderDetailResponse toDetailResponse(Order order) {
+        return OrderDetailResponse.builder()
+                .orderId(order.getId())
+                .userId(order.getUserId())
+                .customerName(order.getCustomerName())
+                .restaurantName(order.getRestaurantName())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * Get order stats for admin
+     */
+    public OrderStatsResponse getOrderStats() {
+        long total = orderRepository.count();
+        long completed = orderRepository.countByStatus(OrderStatus.DELIVERED);
+        long cancelled = orderRepository.countByStatus(OrderStatus.CANCELLED);
+        long pending = orderRepository.countByStatus(OrderStatus.PAYMENT_PENDING);
+        double revenue = orderRepository.sumTotalRevenueByStatus(OrderStatus.DELIVERED);
+        return new OrderStatsResponse(total, completed, cancelled, pending, revenue);
+    }
+
+    public record OrderStatsResponse(long totalOrders, long completedOrders, long cancelledOrders,
+                                     long pendingOrders, double totalRevenue) {}
 }

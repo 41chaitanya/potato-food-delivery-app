@@ -49,9 +49,44 @@ public class RestaurantController {
         restaurantService.softDeleteRestaurant(restaurantId);
     }
 
+    /**
+     * Toggle restaurant open/close status
+     */
+    @PatchMapping("/{restaurantId}/toggle-status")
+    public RestaurantResponse toggleRestaurantStatus(@PathVariable UUID restaurantId) {
+        return restaurantService.toggleRestaurantStatus(restaurantId);
+    }
+
     // Internal API for Menu Service
     @GetMapping("/internal/{restaurantId}")
     public RestaurantInternalResponse getRestaurantInternal(@PathVariable UUID restaurantId) {
         return restaurantService.getRestaurantInternal(restaurantId);
+    }
+
+    // ==================== ADMIN ENDPOINTS ====================
+
+    @GetMapping("/admin/all")
+    public List<RestaurantResponse> getAllRestaurants() {
+        return restaurantService.getAllRestaurants();
+    }
+
+    @GetMapping("/admin/pending")
+    public List<RestaurantResponse> getPendingRestaurants() {
+        return restaurantService.getPendingRestaurants();
+    }
+
+    @PatchMapping("/admin/{restaurantId}/approve")
+    public RestaurantResponse approveRestaurant(@PathVariable UUID restaurantId) {
+        return restaurantService.approveRestaurant(restaurantId);
+    }
+
+    @PatchMapping("/admin/{restaurantId}/reject")
+    public RestaurantResponse rejectRestaurant(@PathVariable UUID restaurantId) {
+        return restaurantService.rejectRestaurant(restaurantId);
+    }
+
+    @GetMapping("/admin/stats")
+    public RestaurantService.RestaurantStatsResponse getRestaurantStats() {
+        return restaurantService.getRestaurantStats();
     }
 }

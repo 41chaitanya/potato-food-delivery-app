@@ -20,5 +20,21 @@ public interface RestaurantService {
 
     void softDeleteRestaurant(UUID restaurantId);
 
+    RestaurantResponse toggleRestaurantStatus(UUID restaurantId);
+
     RestaurantInternalResponse getRestaurantInternal(UUID restaurantId);
+
+    // Admin endpoints
+    List<RestaurantResponse> getAllRestaurants();
+
+    List<RestaurantResponse> getPendingRestaurants();
+
+    RestaurantResponse approveRestaurant(UUID restaurantId);
+
+    RestaurantResponse rejectRestaurant(UUID restaurantId);
+
+    RestaurantStatsResponse getRestaurantStats();
+
+    record RestaurantStatsResponse(long totalRestaurants, long activeRestaurants,
+                                   long pendingRestaurants, long rejectedRestaurants) {}
 }

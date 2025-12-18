@@ -23,5 +23,7 @@ public interface MenuService {
 
     void softDeleteMenuItem(UUID menuItemId);
 
+    MenuItemResponse toggleAvailability(UUID menuItemId);
+
     MenuItemInternalResponse getMenuItemInternal(UUID menuItemId);
 }

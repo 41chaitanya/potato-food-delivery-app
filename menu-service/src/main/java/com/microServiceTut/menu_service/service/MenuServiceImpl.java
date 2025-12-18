@@ -81,6 +81,15 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional
+    public MenuItemResponse toggleAvailability(UUID menuItemId) {
+        MenuItem menuItem = findMenuItemOrThrow(menuItemId);
+        menuItem.setAvailable(!menuItem.isAvailable());
+        MenuItem updated = menuItemRepository.save(menuItem);
+        return MenuMapper.toResponse(updated);
+    }
+
+    @Override
     public MenuItemInternalResponse getMenuItemInternal(UUID menuItemId) {
         MenuItem menuItem = findMenuItemOrThrow(menuItemId);
         return MenuMapper.toInternalResponse(menuItem);

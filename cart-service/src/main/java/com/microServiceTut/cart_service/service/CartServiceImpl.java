@@ -77,6 +77,22 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    public CartResponse updateCartItemQuantity(UUID cartItemId, int quantity) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
+
+        cartItem.updateQuantity(quantity);
+        cartItemRepository.save(cartItem);
+
+        Cart cart = cartItem.getCart();
+        cart.recalculateTotalAmount();
+        Cart savedCart = cartRepository.save(cart);
+
+        return CartMapper.toResponse(savedCart);
+    }
+
+    @Override
+    @Transactional
     public CartResponse removeItemFromCart(UUID cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new CartItemNotFoundException(cartItemId));

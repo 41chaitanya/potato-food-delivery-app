@@ -7,46 +7,53 @@ spring:
 
   cloud:
     gateway:
-      routes:
-        # Auth Service - PUBLIC (no JWT required)
-        - id: auth-service
-          uri: lb://USER-AUTH-SERVICE
-          predicates:
-            - Path=/auth/**
+      server:
+        webflux:
+          routes:
+            # Auth Service - PUBLIC (no JWT required)
+            - id: auth-service
+              uri: lb://USER-AUTH-SERVICE
+              predicates:
+                - Path=/auth/**
 
-        - id: order-service
-          uri: lb://ORDER-SERVICE
-          predicates:
-            - Path=/api/orders/**
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/api/orders/**
 
-        - id: payment-service
-          uri: lb://PAYMENT-SERVICE
-          predicates:
-            - Path=/api/payments/**
+            - id: payment-service
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/api/payments/**
 
-        - id: menu-service
-          uri: lb://MENU-SERVICE
-          predicates:
-            - Path=/api/menus/**
+            - id: menu-service
+              uri: lb://MENU-SERVICE
+              predicates:
+                - Path=/api/menus/**
 
-        - id: restaurant-service
-          uri: lb://RESTAURANT-SERVICE
-          predicates:
-            - Path=/api/restaurants/**
+            - id: restaurant-service
+              uri: lb://RESTAURANT-SERVICE
+              predicates:
+                - Path=/api/restaurants/**
 
-        - id: cart-service
-          uri: lb://CART-SERVICE
-          predicates:
-            - Path=/api/cart/**
+            - id: cart-service
+              uri: lb://CART-SERVICE
+              predicates:
+                - Path=/api/cart/**
 
-        - id: delivery-service
-          uri: lb://DELIVERY-SERVICE
-          predicates:
-            - Path=/api/delivery/**
+            - id: delivery-service
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/api/delivery/**
+
+            - id: admin-service
+              uri: lb://ADMIN-SERVICE
+              predicates:
+                - Path=/api/admin/**
 
 # JWT Configuration - MUST match User-Auth-Service secret
 jwt:
-  secret: ${JWT_SECRET:changeme_use_env_variable}
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
 
 eureka:
   client:

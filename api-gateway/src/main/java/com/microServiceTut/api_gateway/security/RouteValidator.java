@@ -27,18 +27,25 @@ public class RouteValidator {
     // Role-based access rules
     private static final Map<String, Set<String>> ROLE_ACCESS = Map.of(
             "USER", Set.of(
+                    "/auth/profile",   // User profile
                     "/api/cart",
                     "/api/orders",
+                    "/api/payments",   // View payments
                     "/api/menus",      // Read only
                     "/api/restaurants" // Read only
             ),
             "ADMIN", Set.of(
+                    "/auth/profile",   // Admin profile
+                    "/auth/admin",     // Admin user management
+                    "/api/admin",      // Admin service
                     "/api/restaurants",
                     "/api/menus",
                     "/api/orders",
+                    "/api/payments",   // View payments
                     "/api/delivery"    // Admin can assign deliveries
             ),
             "RIDER", Set.of(
+                    "/auth/profile",   // Rider profile
                     "/api/delivery",
                     "/api/orders"
             )

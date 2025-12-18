@@ -28,6 +28,13 @@ public class CartController {
         return cartService.getCartByUserId(userId);
     }
 
+    @PatchMapping("/items/{cartItemId}")
+    public CartResponse updateCartItemQuantity(
+            @PathVariable UUID cartItemId,
+            @RequestParam int quantity) {
+        return cartService.updateCartItemQuantity(cartItemId, quantity);
+    }
+
     @DeleteMapping("/items/{cartItemId}")
     public CartResponse removeItemFromCart(@PathVariable UUID cartItemId) {
         return cartService.removeItemFromCart(cartItemId);

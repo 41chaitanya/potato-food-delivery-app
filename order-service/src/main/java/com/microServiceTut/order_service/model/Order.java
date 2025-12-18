@@ -14,6 +14,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private UUID userId;
     private String customerName;
     private String restaurantName;
     private Double totalAmount;
@@ -22,4 +23,10 @@ public class Order {
     private OrderStatus status;
 
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

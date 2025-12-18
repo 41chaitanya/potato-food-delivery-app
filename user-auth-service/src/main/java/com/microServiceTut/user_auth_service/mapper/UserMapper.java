@@ -2,6 +2,7 @@ package com.microServiceTut.user_auth_service.mapper;
 
 import com.microServiceTut.user_auth_service.dto.request.RegisterRequest;
 import com.microServiceTut.user_auth_service.dto.response.AuthResponse;
+import com.microServiceTut.user_auth_service.dto.response.UserProfileResponse;
 import com.microServiceTut.user_auth_service.dto.response.UserResponse;
 import com.microServiceTut.user_auth_service.model.Role;
 import com.microServiceTut.user_auth_service.model.User;
@@ -39,6 +40,18 @@ public final class UserMapper {
                 .role(user.getRole())
                 .token(token)
                 .tokenType("Bearer")
+                .build();
+    }
+
+    public static UserProfileResponse toProfileResponse(User user) {
+        return UserProfileResponse.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 }

@@ -11,6 +11,8 @@ public interface CartService {
 
     CartResponse getCartByUserId(UUID userId);
 
+    CartResponse updateCartItemQuantity(UUID cartItemId, int quantity);
+
     CartResponse removeItemFromCart(UUID cartItemId);
 
     void clearCart(UUID userId);

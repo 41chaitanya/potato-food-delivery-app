@@ -57,6 +57,14 @@ public class MenuController {
         menuService.softDeleteMenuItem(menuItemId);
     }
 
+    /**
+     * Toggle menu item availability
+     */
+    @PatchMapping("/{menuItemId}/toggle-availability")
+    public MenuItemResponse toggleAvailability(@PathVariable UUID menuItemId) {
+        return menuService.toggleAvailability(menuItemId);
+    }
+
     // Internal API for Cart Service
     @GetMapping("/internal/{menuItemId}")
     public MenuItemInternalResponse getMenuItemInternal(@PathVariable UUID menuItemId) {

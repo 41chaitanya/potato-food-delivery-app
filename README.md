@@ -182,6 +182,62 @@ Authorization: Bearer <your_jwt_token>
 | `USER` | Cart, Orders, View restaurants/menus |
 | `RIDER` | Delivery pickup & deliver |
 
+### API Endpoints Summary
+
+#### Auth Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login user |
+| GET | `/auth/profile/{userId}` | Get user profile |
+| PATCH | `/auth/profile/{userId}` | Update profile (name, phone, address) |
+
+#### Restaurant Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/restaurants` | Create restaurant |
+| GET | `/api/restaurants` | Get all active restaurants |
+| GET | `/api/restaurants/{id}` | Get restaurant by ID |
+| PATCH | `/api/restaurants/{id}` | Update restaurant |
+| PATCH | `/api/restaurants/{id}/toggle-status` | Open/Close restaurant |
+| DELETE | `/api/restaurants/{id}` | Soft delete restaurant |
+
+#### Menu Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/menus` | Create menu item |
+| GET | `/api/menus/{id}` | Get menu item |
+| GET | `/api/menus/restaurant/{restaurantId}` | Get menu by restaurant |
+| PATCH | `/api/menus/{id}` | Update menu item |
+| PATCH | `/api/menus/{id}/toggle-availability` | Toggle item availability |
+| DELETE | `/api/menus/{id}` | Soft delete menu item |
+
+#### Cart Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/cart/items` | Add item to cart |
+| GET | `/api/cart/{userId}` | Get user's cart |
+| PATCH | `/api/cart/items/{itemId}?quantity=N` | Update item quantity |
+| DELETE | `/api/cart/items/{itemId}` | Remove item from cart |
+| DELETE | `/api/cart/{userId}` | Clear cart |
+
+#### Order Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/orders` | Create order |
+| GET | `/api/orders/{orderId}` | Get order by ID |
+| GET | `/api/orders/user/{userId}` | Get order history |
+| PATCH | `/api/orders/{orderId}/cancel` | Cancel order |
+| PATCH | `/api/orders/{orderId}/status?status=X` | Update order status |
+
+#### Delivery Service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/delivery/assign/{orderId}` | Assign delivery (ADMIN) |
+| GET | `/api/delivery/rider` | Get rider's deliveries |
+| PUT | `/api/delivery/{id}/pickup` | Pickup order (RIDER) |
+| PUT | `/api/delivery/{id}/deliver` | Deliver order (RIDER) |
+
 ### Base URLs
 
 | Service | Direct URL | Via Gateway |
