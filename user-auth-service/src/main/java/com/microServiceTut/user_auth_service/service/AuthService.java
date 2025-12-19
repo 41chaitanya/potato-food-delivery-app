@@ -18,6 +18,19 @@ public interface AuthService {
 
     TokenValidationResponse validateToken(String token);
 
+    /**
+     * Logout user by blacklisting their JWT token
+     * @param token JWT token to invalidate
+     */
+    void logout(String token);
+
+    /**
+     * Check if a token has been blacklisted (user logged out)
+     * @param token JWT token to check
+     * @return true if token is blacklisted
+     */
+    boolean isTokenBlacklisted(String token);
+
     UserProfileResponse getProfile(UUID userId);
 
     UserProfileResponse updateProfile(UUID userId, UpdateProfileRequest request);

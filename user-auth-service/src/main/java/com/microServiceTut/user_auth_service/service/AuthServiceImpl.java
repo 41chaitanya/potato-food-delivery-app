@@ -16,6 +16,7 @@ import com.microServiceTut.user_auth_service.model.User;
 import com.microServiceTut.user_auth_service.repository.UserRepository;
 import com.microServiceTut.user_auth_service.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     @Transactional
@@ -76,6 +79,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenValidationResponse validateToken(String token) {
+        // First check if token is blacklisted (user logged out)
+        if (isTokenBlacklisted(token)) {
+            log.warn("Token validation failed: token is blacklisted");
+            return TokenValidationResponse.builder()
+                    .valid(false)
+                    .build();
+        }
+
         // Validate token and extract claims
         if (!jwtUtil.isTokenValid(token)) {
             return TokenValidationResponse.builder()
@@ -93,6 +104,28 @@ public class AuthServiceImpl implements AuthService {
                 .email(email)
                 .role(role)
                 .build();
+    }
+
+    /**
+     * Logout user by adding their token to Redis blacklist
+     * Token will be rejected on subsequent requests until it expires
+     */
+    @Override
+    public void logout(String token) {
+        String tokenId = jwtUtil.getTokenId(token);
+        long remainingTime = jwtUtil.getRemainingExpirationTime(token);
+        
+        tokenBlacklistService.blacklistToken(tokenId, remainingTime);
+        log.info("User logged out, token blacklisted: {}", tokenId);
+    }
+
+    /**
+     * Check if token is in blacklist (user has logged out)
+     */
+    @Override
+    public boolean isTokenBlacklisted(String token) {
+        String tokenId = jwtUtil.getTokenId(token);
+        return tokenBlacklistService.isTokenBlacklisted(tokenId);
     }
 
     @Override

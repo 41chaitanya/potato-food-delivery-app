@@ -9,36 +9,33 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * JWT utility class for token generation and validation.
- * Uses HS256 algorithm with secret key from environment.
- */
 @Component
 public class JwtUtil {
 
     private final SecretKey secretKey;
     private final long expiration;
 
-    public JwtUtil(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration) {
-        // Create signing key from secret - must be at least 256 bits for HS256
+    public JwtUtil(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long expiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }
 
-    /**
-     * Generate JWT token containing userId, email, and role.
-     * Token is signed with HS256 algorithm.
-     */
+    public long getExpirationTime() {
+        return expiration;
+    }
+
     public String generateToken(User user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
-
+        String jti = UUID.randomUUID().toString();
         return Jwts.builder()
+                .id(jti)
                 .subject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
@@ -48,10 +45,34 @@ public class JwtUtil {
                 .compact();
     }
 
-    /**
-     * Validate token and return claims if valid.
-     * Returns null if token is invalid or expired.
-     */
+    public String getTokenId(String token) {
+        Claims claims = validateToken(token);
+        if (claims != null && claims.getId() != null) {
+            return claims.getId();
+        }
+        return hashToken(token);
+    }
+
+    public long getRemainingExpirationTime(String token) {
+        Claims claims = validateToken(token);
+        if (claims != null && claims.getExpiration() != null) {
+            long expirationTime = claims.getExpiration().getTime();
+            long currentTime = System.currentTimeMillis();
+            return Math.max(0, expirationTime - currentTime);
+        }
+        return expiration;
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            return token.substring(token.length() - 32);
+        }
+    }
+
     public Claims validateToken(String token) {
         try {
             return Jwts.parser()
@@ -64,25 +85,16 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Extract user ID from token.
-     */
     public UUID getUserIdFromToken(String token) {
         Claims claims = validateToken(token);
         return claims != null ? UUID.fromString(claims.getSubject()) : null;
     }
 
-    /**
-     * Extract email from token.
-     */
     public String getEmailFromToken(String token) {
         Claims claims = validateToken(token);
         return claims != null ? claims.get("email", String.class) : null;
     }
 
-    /**
-     * Extract role from token.
-     */
     public Role getRoleFromToken(String token) {
         Claims claims = validateToken(token);
         if (claims != null) {
@@ -92,9 +104,6 @@ public class JwtUtil {
         return null;
     }
 
-    /**
-     * Check if token is valid (not expired and properly signed).
-     */
     public boolean isTokenValid(String token) {
         return validateToken(token) != null;
     }

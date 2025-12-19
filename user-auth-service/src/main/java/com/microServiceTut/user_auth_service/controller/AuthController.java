@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -56,6 +56,25 @@ public class AuthController {
 
         String token = authHeader.substring(7);
         return authService.validateToken(token);
+    }
+
+    /**
+     * Logout user by blacklisting their JWT token
+     * Token will be rejected on subsequent requests
+     */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public java.util.Map<String, String> logout(
+            @RequestHeader(value = "Authorization", required = true) String authHeader) {
+        
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return java.util.Map.of("message", "Invalid authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        authService.logout(token);
+        
+        return java.util.Map.of("message", "Logged out successfully");
     }
 
     /**
