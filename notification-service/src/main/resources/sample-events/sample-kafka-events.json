@@ -1,0 +1,125 @@
+{
+  "_description": "Sample Kafka events for Notification Service. Producer services should publish events in this format.",
+  
+  "ORDER_CREATED": {
+    "eventType": "ORDER_CREATED",
+    "referenceId": "ORD-2024-001234",
+    "userId": "user-789",
+    "message": "Your order #ORD-2024-001234 has been placed successfully! Estimated delivery: 30-40 mins.",
+    "metadata": {
+      "restaurantName": "Pizza Palace",
+      "restaurantId": "rest-456",
+      "totalAmount": "599.00",
+      "currency": "INR",
+      "itemCount": 3,
+      "estimatedDelivery": "30-40 mins",
+      "deliveryAddress": "123 Main Street, Bangalore"
+    },
+    "timestamp": "2024-12-19T10:30:00Z",
+    "traceId": "abc123xyz789",
+    "email": "customer@example.com",
+    "phone": "+919876543210"
+  },
+
+  "PAYMENT_SUCCESS": {
+    "eventType": "PAYMENT_SUCCESS",
+    "referenceId": "PAY-2024-005678",
+    "userId": "user-789",
+    "message": "Payment of ₹599.00 received for order #ORD-2024-001234. Thank you!",
+    "metadata": {
+      "orderId": "ORD-2024-001234",
+      "amount": "599.00",
+      "currency": "INR",
+      "paymentMethod": "UPI",
+      "transactionId": "TXN-ABC123",
+      "paidAt": "2024-12-19T10:31:00Z"
+    },
+    "timestamp": "2024-12-19T10:31:00Z",
+    "traceId": "abc123xyz789",
+    "email": "customer@example.com"
+  },
+
+  "PAYMENT_FAILED": {
+    "eventType": "PAYMENT_FAILED",
+    "referenceId": "PAY-2024-005679",
+    "userId": "user-789",
+    "message": "Payment failed for order #ORD-2024-001235. Please try again or use a different payment method.",
+    "metadata": {
+      "orderId": "ORD-2024-001235",
+      "amount": "450.00",
+      "currency": "INR",
+      "paymentMethod": "CARD",
+      "failureReason": "Insufficient funds",
+      "retryUrl": "https://app.fooddelivery.com/retry-payment/ORD-2024-001235"
+    },
+    "timestamp": "2024-12-19T11:00:00Z",
+    "traceId": "def456uvw123",
+    "email": "customer@example.com",
+    "phone": "+919876543210"
+  },
+
+  "DELIVERY_ASSIGNED": {
+    "eventType": "DELIVERY_ASSIGNED",
+    "referenceId": "DEL-2024-007890",
+    "userId": "user-789",
+    "message": "Good news! Rahul is on the way to pick up your order from Pizza Palace.",
+    "metadata": {
+      "orderId": "ORD-2024-001234",
+      "riderName": "Rahul Kumar",
+      "riderId": "rider-321",
+      "riderPhone": "+919123456789",
+      "vehicleNumber": "KA-01-AB-1234",
+      "estimatedPickup": "10 mins",
+      "trackingUrl": "https://app.fooddelivery.com/track/DEL-2024-007890"
+    },
+    "timestamp": "2024-12-19T10:35:00Z",
+    "traceId": "abc123xyz789",
+    "email": "customer@example.com"
+  },
+
+  "DELIVERY_PICKED": {
+    "eventType": "DELIVERY_PICKED",
+    "referenceId": "DEL-2024-007890",
+    "userId": "user-789",
+    "message": "Your order has been picked up! Rahul is on the way. ETA: 20 mins.",
+    "metadata": {
+      "orderId": "ORD-2024-001234",
+      "riderName": "Rahul Kumar",
+      "pickedAt": "2024-12-19T10:45:00Z",
+      "estimatedDelivery": "20 mins",
+      "trackingUrl": "https://app.fooddelivery.com/track/DEL-2024-007890"
+    },
+    "timestamp": "2024-12-19T10:45:00Z",
+    "traceId": "abc123xyz789"
+  },
+
+  "DELIVERY_COMPLETED": {
+    "eventType": "DELIVERY_COMPLETED",
+    "referenceId": "DEL-2024-007890",
+    "userId": "user-789",
+    "message": "Your order has been delivered! Enjoy your meal. Rate your experience?",
+    "metadata": {
+      "orderId": "ORD-2024-001234",
+      "riderName": "Rahul Kumar",
+      "deliveredAt": "2024-12-19T11:05:00Z",
+      "deliveryTime": "35 mins",
+      "ratingUrl": "https://app.fooddelivery.com/rate/ORD-2024-001234"
+    },
+    "timestamp": "2024-12-19T11:05:00Z",
+    "traceId": "abc123xyz789",
+    "email": "customer@example.com"
+  },
+
+  "_kafka_producer_example": {
+    "description": "Example code for producing events from Order Service",
+    "java_code": "kafkaTemplate.send('notification-events', event.getReferenceId(), event);"
+  },
+
+  "_topic_configuration": {
+    "topic_name": "notification-events",
+    "partitions": 3,
+    "replication_factor": 1,
+    "retention_ms": 604800000,
+    "cleanup_policy": "delete"
+  }
+}

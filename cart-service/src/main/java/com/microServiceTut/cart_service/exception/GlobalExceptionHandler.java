@@ -1,5 +1,6 @@
 package com.microServiceTut.cart_service.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,49 +18,49 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CartNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleCartNotFound(CartNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleCartNotFound(CartNotFoundException ex, HttpServletRequest request) {
         log.warn("Cart not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(CartItemNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleCartItemNotFound(CartItemNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleCartItemNotFound(CartItemNotFoundException ex, HttpServletRequest request) {
         log.warn("Cart item not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(MenuItemNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleMenuItemNotFound(MenuItemNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleMenuItemNotFound(MenuItemNotFoundException ex, HttpServletRequest request) {
         log.warn("Menu item not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(MenuItemUnavailableException.class)
-    public ResponseEntity<Map<String, Object>> handleMenuItemUnavailable(MenuItemUnavailableException ex) {
+    public ResponseEntity<Map<String, Object>> handleMenuItemUnavailable(MenuItemUnavailableException ex, HttpServletRequest request) {
         log.warn("Menu item unavailable: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(RestaurantMismatchException.class)
-    public ResponseEntity<Map<String, Object>> handleRestaurantMismatch(RestaurantMismatchException ex) {
+    public ResponseEntity<Map<String, Object>> handleRestaurantMismatch(RestaurantMismatchException ex, HttpServletRequest request) {
         log.warn("Restaurant mismatch: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(WebClientResponseException.NotFound.class)
-    public ResponseEntity<Map<String, Object>> handleWebClientNotFound(WebClientResponseException.NotFound ex) {
+    public ResponseEntity<Map<String, Object>> handleWebClientNotFound(WebClientResponseException.NotFound ex, HttpServletRequest request) {
         log.error("Menu service resource not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Menu service: resource not found");
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Menu service: resource not found", request.getRequestURI());
     }
 
     @ExceptionHandler(WebClientResponseException.class)
-    public ResponseEntity<Map<String, Object>> handleWebClientException(WebClientResponseException ex) {
+    public ResponseEntity<Map<String, Object>> handleWebClientException(WebClientResponseException ex, HttpServletRequest request) {
         log.error("Menu service unavailable: status={}, message={}", ex.getStatusCode(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Menu service is unavailable");
+        return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Menu service is unavailable", request.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
@@ -70,23 +71,26 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Validation Failed");
+        body.put("message", "Request validation failed");
         body.put("errors", fieldErrors);
+        body.put("path", request.getRequestURI());
 
         return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {
         log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request.getRequestURI());
     }
 
-    private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message) {
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message, String path) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
         body.put("message", message);
+        body.put("path", path);
         return ResponseEntity.status(status).body(body);
     }
 }

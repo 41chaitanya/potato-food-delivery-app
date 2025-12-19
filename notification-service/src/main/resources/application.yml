@@ -1,0 +1,15 @@
+# =============================================================================
+# NOTIFICATION-SERVICE - Local Bootstrap Configuration
+# =============================================================================
+# Only minimal config here - everything else comes from Config Server
+# =============================================================================
+
+spring:
+  application:
+    name: NOTIFICATION-SERVICE
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8089}
+
+# Fallback values (used only if Config Server is unavailable)
+server:
+  port: ${SERVER_PORT:8090}

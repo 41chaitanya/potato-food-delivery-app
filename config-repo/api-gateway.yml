@@ -3,7 +3,7 @@
 # ============================================================================
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
@@ -14,6 +14,7 @@ spring:
       server:
         webflux:
           routes:
+            # Auth Service - PUBLIC (no JWT required)
             - id: auth-service
               uri: lb://USER-AUTH-SERVICE
               predicates:
@@ -54,9 +55,17 @@ spring:
               predicates:
                 - Path=/api/admin/**
 
+            # Notification Service
+            - id: notification-service
+              uri: lb://NOTIFICATION-SERVICE
+              predicates:
+                - Path=/api/notifications/**
+
+# JWT Configuration - MUST match User-Auth-Service secret
 jwt:
   secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
 
 logging:
   level:
     com.microServiceTut.api_gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG

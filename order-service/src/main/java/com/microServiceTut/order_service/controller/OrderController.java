@@ -2,7 +2,9 @@ package com.microServiceTut.order_service.controller;
 
 import com.microServiceTut.order_service.dto.*;
 import com.microServiceTut.order_service.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,12 +12,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderController {
-    @Autowired
-    private OrderService orderService;
+    
+    private final OrderService orderService;
 
     @PostMapping
-    public OrderResponse createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderResponse createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
         return orderService.createOrder(createOrderRequest);
     }
 

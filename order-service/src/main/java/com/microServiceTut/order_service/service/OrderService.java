@@ -2,31 +2,33 @@ package com.microServiceTut.order_service.service;
 
 import com.microServiceTut.order_service.client.PaymentClient;
 import com.microServiceTut.order_service.dto.*;
+import com.microServiceTut.order_service.exception.InvalidOrderStateException;
+import com.microServiceTut.order_service.exception.OrderNotFoundException;
 import com.microServiceTut.order_service.model.Order;
 import com.microServiceTut.order_service.model.OrderStatus;
 import com.microServiceTut.order_service.model.PaymentStatus;
 import com.microServiceTut.order_service.repository.OrderRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private PaymentClient paymentClient;
+    private final OrderRepository orderRepository;
+    private final PaymentClient paymentClient;
 
     @CircuitBreaker(name = "paymentCB", fallbackMethod = "paymentFallback")
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+        log.info("Creating order for user: {}, restaurant: {}", 
+                createOrderRequest.getUserId(), createOrderRequest.getRestaurantName());
 
         // 1. Create order
         Order order = new Order();
@@ -39,22 +41,20 @@ public class OrderService {
 
         // 2. Save order FIRST (ID generated here)
         Order savedOrder = orderRepository.save(order);
+        log.debug("Order saved with ID: {}", savedOrder.getId());
 
         // 3. Call payment service
+        PaymentResponse paymentResponse = paymentClient.makePayment(
+                new PaymentRequest(savedOrder.getId(), savedOrder.getTotalAmount())
+        );
 
-            PaymentResponse paymentResponse =
-                    paymentClient.makePayment(
-                            new PaymentRequest(
-                                    savedOrder.getId(),
-                                    savedOrder.getTotalAmount()
-                            )
-                    );
-
-            if (PaymentStatus.SUCCESS.equals(paymentResponse.getStatus())) {
-                savedOrder.setStatus(OrderStatus.PAID);
-            } else {
-                savedOrder.setStatus(OrderStatus.PAYMENT_FAILED);
-            }
+        if (PaymentStatus.SUCCESS.equals(paymentResponse.getStatus())) {
+            savedOrder.setStatus(OrderStatus.PAID);
+            log.info("Order {} payment successful", savedOrder.getId());
+        } else {
+            savedOrder.setStatus(OrderStatus.PAYMENT_FAILED);
+            log.warn("Order {} payment failed", savedOrder.getId());
+        }
 
 
         // 4. Save UPDATED status
@@ -67,42 +67,42 @@ public class OrderService {
                 savedOrder.getTotalAmount()
         );
     }
-//    fall back
-public OrderResponse paymentFallback(
-        CreateOrderRequest request,
-        Throwable ex) {
+    /**
+     * Fallback method when payment service is unavailable
+     */
+    public OrderResponse paymentFallback(CreateOrderRequest request, Throwable ex) {
+        log.warn("Payment service unavailable, order saved with PAYMENT_PENDING status. Reason: {}", ex.getMessage());
 
-    System.out.println("🔥 FALLBACK TRIGGERED due to: " + ex.getMessage());
+        Order order = new Order();
+        order.setUserId(request.getUserId());
+        order.setCustomerName(request.getCustomerName());
+        order.setRestaurantName(request.getRestaurantName());
+        order.setTotalAmount(request.getTotalAmount());
+        order.setStatus(OrderStatus.PAYMENT_PENDING);
+        order.setCreatedAt(LocalDateTime.now());
 
-    Order order = new Order();
-    order.setCustomerName(request.getCustomerName());
-    order.setRestaurantName(request.getRestaurantName());
-    order.setTotalAmount(request.getTotalAmount());
-    order.setStatus(OrderStatus.PAYMENT_PENDING);
-    order.setCreatedAt(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
 
-    Order savedOrder = orderRepository.save(order);
-
-    return new OrderResponse(
-            savedOrder.getId(),
-            savedOrder.getStatus(),
-            savedOrder.getTotalAmount()
-    );
-}
+        return new OrderResponse(
+                savedOrder.getId(),
+                savedOrder.getStatus(),
+                savedOrder.getTotalAmount()
+        );
+    }
 
     /**
      * Internal API for Delivery Service.
      * Returns minimal order info needed for delivery assignment.
      */
     public OrderBasicResponse getOrderBasic(UUID orderId) {
+        log.debug("Fetching basic order info for orderId: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
         return new OrderBasicResponse(
                 order.getId(),
                 order.getStatus().name(),
-                null  // restaurantId not available in current schema
+                null
         );
     }
 
@@ -110,11 +110,16 @@ public OrderResponse paymentFallback(
      * Update order status
      */
     public OrderBasicResponse updateOrderStatus(UUID orderId, String status) {
+        log.info("Updating order {} status to {}", orderId, status);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
-        order.setStatus(OrderStatus.valueOf(status));
+        try {
+            order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOrderStateException("Invalid order status: " + status);
+        }
+        
         orderRepository.save(order);
 
         return new OrderBasicResponse(
@@ -128,9 +133,9 @@ public OrderResponse paymentFallback(
      * Get order by ID
      */
     public OrderDetailResponse getOrderById(UUID orderId) {
+        log.debug("Fetching order details for orderId: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
         return toDetailResponse(order);
     }
@@ -139,6 +144,7 @@ public OrderResponse paymentFallback(
      * Get order history for user
      */
     public List<OrderDetailResponse> getOrderHistory(UUID userId) {
+        log.debug("Fetching order history for userId: {}", userId);
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(this::toDetailResponse)
@@ -149,17 +155,21 @@ public OrderResponse paymentFallback(
      * Cancel order
      */
     public OrderDetailResponse cancelOrder(UUID orderId) {
+        log.info("Cancelling order: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
-        // Can only cancel if not delivered
         if (order.getStatus() == OrderStatus.DELIVERED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel delivered order");
+            throw new InvalidOrderStateException("Cannot cancel delivered order");
+        }
+        
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidOrderStateException("Order is already cancelled");
         }
 
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
+        log.info("Order {} cancelled successfully", orderId);
 
         return toDetailResponse(saved);
     }

@@ -32,12 +32,28 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 └────────┘    └────────┘    └────────┘    └────────┘    └───┬────┘
                                                             │
                                           ┌─────────────────┼─────────────────┐
-                                          ▼                                   ▼
-                                    ┌────────┐                          ┌────────┐
-                                    │Payment │                          │Delivery│
-                                    │Service │                          │Service │
-                                    │  8082  │                          │  8087  │
-                                    └────────┘                          └────────┘
+                                          ▼                 │                 ▼
+                                    ┌────────┐              │           ┌────────┐
+                                    │Payment │              │           │Delivery│
+                                    │Service │              │           │Service │
+                                    │  8082  │              │           │  8087  │
+                                    └───┬────┘              │           └───┬────┘
+                                        │                   │               │
+                                        └───────────────────┼───────────────┘
+                                                            │
+                                                            ▼
+                                                    ┌──────────────┐
+                                                    │    KAFKA     │
+                                                    │ notification │
+                                                    │   -events    │
+                                                    └──────┬───────┘
+                                                           │
+                                                           ▼
+                                                    ┌─────────────┐
+                                                    │Notification │
+                                                    │  Service    │
+                                                    │    8090     │
+                                                    └─────────────┘
 ```
 
 ---
@@ -47,16 +63,17 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | Java | 21 | Programming Language |
-| Spring Boot | 3.5.x | Application Framework |
-| Spring Cloud | 2025.0.0 | Microservices Tools |
+| Spring Boot | 3.4.x | Application Framework |
+| Spring Cloud | 2024.0.0 | Microservices Tools |
 | PostgreSQL | 12+ | Database |
 | Redis Cloud | 8.x | Caching & JWT Blacklist |
+| Apache Kafka | 3.9.x | Event Streaming |
 | Netflix Eureka | - | Service Discovery |
 | Spring Cloud Gateway | - | API Gateway |
 | Spring Cloud Config | - | Centralized Configuration |
 | JWT | - | Authentication |
 | Resilience4j | - | Circuit Breaker |
-| Grafana Loki | - | Centralized Logging |
+
 | Zipkin/Tempo | - | Distributed Tracing |
 | Lombok | 1.18.34 | Boilerplate Reduction |
 | Maven | 3.9+ | Build Tool |
@@ -78,6 +95,7 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 | Payment Service | 8082 | Payment processing (mock) | ✅ Active |
 | Delivery Service | 8087 | Delivery & rider management | ✅ Active |
 | Admin Service | 8088 | Platform analytics & management | ✅ Active |
+| Notification Service | 8090 | Event-driven notifications (Kafka) | ✅ Active |
 
 ---
 
@@ -284,19 +302,6 @@ Redis Cloud is used for caching frequently accessed data and JWT token blacklist
 
 ---
 
-## 📊 Observability
-
-### Centralized Logging (Grafana Loki)
-All services send logs to Grafana Cloud Loki with trace correlation.
-
-### Distributed Tracing (Zipkin/Tempo)
-Request tracing across services with unique trace IDs.
-
-### Health Monitoring
-Each service exposes `/actuator/health` endpoint.
-
----
-
 ## 📁 Project Structure
 
 ```
@@ -318,7 +323,7 @@ food-delivery-microservices/
 ├── payment-service/          # Payment processing
 ├── delivery-service/         # Delivery management
 ├── admin-service/            # Platform analytics
-└── observability/            # Monitoring configs
+└── notification-service/     # Event-driven notifications (Kafka)
 ```
 
 ### Service Structure (Each Service)
@@ -376,15 +381,14 @@ service-name/
 
 ## 🔧 Key Features
 
-- **Microservices Architecture** - 11 independent services
+- **Microservices Architecture** - 12 independent services
 - **Service Discovery** - Netflix Eureka for dynamic service registration
 - **API Gateway** - Single entry point with JWT authentication
 - **Centralized Config** - Spring Cloud Config Server
 - **Redis Caching** - High-performance caching with Redis Cloud
 - **JWT Blacklist** - Secure logout with Redis-based token blacklist
 - **Circuit Breaker** - Resilience4j for fault tolerance
-- **Centralized Logging** - Grafana Loki integration
-- **Distributed Tracing** - Zipkin/Tempo for request tracing
+
 - **Role-Based Access** - ADMIN, USER, RIDER roles
 
 ---

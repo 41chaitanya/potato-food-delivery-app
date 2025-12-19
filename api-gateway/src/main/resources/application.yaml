@@ -1,5 +1,8 @@
-server:
-  port: 8080
+# =============================================================================
+# API-GATEWAY - Local Bootstrap Configuration
+# =============================================================================
+# Only minimal config here - everything else comes from Config Server
+# =============================================================================
 
 spring:
   application:
@@ -7,85 +10,6 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8089}
 
-  cloud:
-    gateway:
-      server:
-        webflux:
-          routes:
-            # Auth Service - PUBLIC (no JWT required)
-            - id: auth-service
-              uri: lb://USER-AUTH-SERVICE
-              predicates:
-                - Path=/auth/**
-
-            - id: order-service
-              uri: lb://ORDER-SERVICE
-              predicates:
-                - Path=/api/orders/**
-
-            - id: payment-service
-              uri: lb://PAYMENT-SERVICE
-              predicates:
-                - Path=/api/payments/**
-
-            - id: menu-service
-              uri: lb://MENU-SERVICE
-              predicates:
-                - Path=/api/menus/**
-
-            - id: restaurant-service
-              uri: lb://RESTAURANT-SERVICE
-              predicates:
-                - Path=/api/restaurants/**
-
-            - id: cart-service
-              uri: lb://CART-SERVICE
-              predicates:
-                - Path=/api/cart/**
-
-            - id: delivery-service
-              uri: lb://DELIVERY-SERVICE
-              predicates:
-                - Path=/api/delivery/**
-
-            - id: admin-service
-              uri: lb://ADMIN-SERVICE
-              predicates:
-                - Path=/api/admin/**
-
-# JWT Configuration - MUST match User-Auth-Service secret
-jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
-logging:
-  level:
-    com.microServiceTut.api_gateway: DEBUG
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-
-# Distributed Tracing Configuration
-management:
-  tracing:
-    sampling:
-      probability: 0.0
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
-
-# Grafana Cloud Loki Configuration
-loki:
-  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
-  user: ${LOKI_USER:1431940}
-  password: ${LOKI_PASSWORD:}
-
-
-
-
-
+# Fallback values (used only if Config Server is unavailable)
+server:
+  port: ${SERVER_PORT:8080}

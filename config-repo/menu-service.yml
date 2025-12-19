@@ -3,7 +3,7 @@
 # ============================================================================
 
 server:
-  port: 8084
+  port: ${SERVER_PORT:8084}
 
 spring:
   application:
@@ -12,18 +12,24 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${MENU_DB:menu_db}
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:1122334455}
+    password: ${DB_PASSWORD:postgres}
 
-  sql:
-    init:
-      mode: always
-
-  jpa:
-    defer-datasource-initialization: true
-
-  # Redis Configuration
+  # Redis Cache Configuration
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  cache:
+    type: redis
+
+logging:
+  level:
+    com.microServiceTut.menu_service: DEBUG

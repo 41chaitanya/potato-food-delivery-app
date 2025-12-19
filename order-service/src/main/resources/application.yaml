@@ -1,5 +1,8 @@
-server:
-  port: 8081
+# =============================================================================
+# ORDER-SERVICE - Local Bootstrap Configuration
+# =============================================================================
+# Only minimal config here - everything else comes from Config Server
+# =============================================================================
 
 spring:
   application:
@@ -7,91 +10,6 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8089}
 
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${ORDER_DB:order_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:1122334455}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    hostname: localhost
-
-# RESILIENCE4J Configuration
-resilience4j:
-  circuitbreaker:
-    instances:
-      paymentCB:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-        minimumNumberOfCalls: 5
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-
-  retry:
-    instances:
-      paymentRetry:
-        maxAttempts: 3
-        waitDuration: 1s
-
-  timelimiter:
-    instances:
-      paymentTimeLimiter:
-        timeoutDuration: 2s
-
-  ratelimiter:
-    instances:
-      paymentRateLimiter:
-        limitForPeriod: 5
-        limitRefreshPeriod: 10s
-
-  bulkhead:
-    instances:
-      paymentBulkhead:
-        maxConcurrentCalls: 3
-
-logging:
-  level:
-    io.github.resilience4j.circuitbreaker: DEBUG
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus
-  tracing:
-    sampling:
-      probability: 0.0
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
-
-# Grafana Cloud Loki Configuration
-loki:
-  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
-  user: ${LOKI_USER:1431940}
-  password: ${LOKI_PASSWORD:}
-
-
-
-
-
+# Fallback values (used only if Config Server is unavailable)
+server:
+  port: ${SERVER_PORT:8081}

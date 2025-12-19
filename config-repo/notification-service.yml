@@ -1,0 +1,52 @@
+# =============================================================================
+# NOTIFICATION-SERVICE CONFIGURATION
+# =============================================================================
+
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: NOTIFICATION-SERVICE
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${NOTIFICATION_DB:notification_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.fooddelivery.notification.dto.NotificationEvent
+    listener:
+      ack-mode: manual
+      concurrency: 3
+
+# Custom Properties
+notification:
+  kafka:
+    topic: notification-events
+    retry:
+      max-attempts: 3
+      backoff-ms: 1000
+
+# Health check for Kafka
+management:
+  health:
+    kafka:
+      enabled: true
+
+logging:
+  level:
+    com.fooddelivery.notification: DEBUG
+    org.apache.kafka: WARN
+    org.springframework.kafka: INFO

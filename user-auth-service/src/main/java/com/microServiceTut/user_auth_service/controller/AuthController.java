@@ -91,7 +91,7 @@ public class AuthController {
     @PatchMapping("/profile/{userId}")
     public UserProfileResponse updateProfile(
             @PathVariable UUID userId,
-            @RequestBody UpdateProfileRequest request) {
+            @Valid @RequestBody UpdateProfileRequest request) {
         return authService.updateProfile(userId, request);
     }
 
