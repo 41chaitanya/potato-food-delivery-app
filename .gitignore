@@ -50,4 +50,11 @@ Thumbs.db
 # ===========================================
 # Documentation (Local Testing Docs)
 # ===========================================
-docs/
+# docs/  # Keep docs in version control
+
+# ===========================================
+# Docker
+# ===========================================
+# Keep .env.docker and .env.example in version control
+!.env.docker
+!.env.example

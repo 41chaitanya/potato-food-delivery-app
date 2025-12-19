@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Build outputs
+**/target/
+**/build/
+
+# Logs
+**/*.log
+
+# Environment files
+.env
+.env.*
+
+# Documentation
+docs/
+*.md
+
+# Test files
+**/src/test/
+
+# Maven wrapper (will be downloaded)
+**/.mvn/wrapper/maven-wrapper.jar
