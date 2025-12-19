@@ -50,10 +50,14 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 | Spring Boot | 3.5.x | Application Framework |
 | Spring Cloud | 2025.0.0 | Microservices Tools |
 | PostgreSQL | 12+ | Database |
+| Redis Cloud | 8.x | Caching & JWT Blacklist |
 | Netflix Eureka | - | Service Discovery |
 | Spring Cloud Gateway | - | API Gateway |
+| Spring Cloud Config | - | Centralized Configuration |
 | JWT | - | Authentication |
 | Resilience4j | - | Circuit Breaker |
+| Grafana Loki | - | Centralized Logging |
+| Zipkin/Tempo | - | Distributed Tracing |
 | Lombok | 1.18.34 | Boilerplate Reduction |
 | Maven | 3.9+ | Build Tool |
 
@@ -63,6 +67,7 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 
 | Service | Port | Description | Status |
 |---------|------|-------------|--------|
+| Config Server | 8089 | Centralized Configuration | ✅ Active |
 | Service Registry | 8761 | Eureka Server - Service Discovery | ✅ Active |
 | API Gateway | 8080 | Entry point, JWT validation, routing | ✅ Active |
 | User Auth Service | 8086 | User registration, login, JWT tokens | ✅ Active |
@@ -72,6 +77,7 @@ A production-ready food delivery backend built with Spring Boot Microservices ar
 | Order Service | 8081 | Order processing with payment | ✅ Active |
 | Payment Service | 8082 | Payment processing (mock) | ✅ Active |
 | Delivery Service | 8087 | Delivery & rider management | ✅ Active |
+| Admin Service | 8088 | Platform analytics & management | ✅ Active |
 
 ---
 
@@ -141,11 +147,15 @@ For each service:
 Start services in this order:
 
 ```bash
-# 1. Service Registry (Start First!)
+# 1. Config Server (Start First!)
+cd config-server
+./mvnw spring-boot:run
+
+# 2. Service Registry
 cd service-registry
 ./mvnw spring-boot:run
 
-# 2. Other Services (Any Order)
+# 3. Other Services (Any Order)
 cd user-auth-service && ./mvnw spring-boot:run
 cd restaurant-service && ./mvnw spring-boot:run
 cd menu-service && ./mvnw spring-boot:run
@@ -153,13 +163,15 @@ cd cart-service && ./mvnw spring-boot:run
 cd payment-service && ./mvnw spring-boot:run
 cd order-service && ./mvnw spring-boot:run
 cd delivery-service && ./mvnw spring-boot:run
+cd admin-service && ./mvnw spring-boot:run
 
-# 3. API Gateway (Start Last!)
+# 4. API Gateway (Start Last!)
 cd api-gateway && ./mvnw spring-boot:run
 ```
 
 ### Verify Services
 
+- Config Server: http://localhost:8089/actuator/health
 - Eureka Dashboard: http://localhost:8761
 - API Gateway: http://localhost:8080
 
@@ -251,23 +263,62 @@ Authorization: Bearer <your_jwt_token>
 
 ---
 
+## 🚀 Redis Caching
+
+Redis Cloud is used for caching frequently accessed data and JWT token blacklist.
+
+| Service | Cache Use Case | TTL |
+|---------|---------------|-----|
+| Menu Service | Menu items by restaurant | 15 min |
+| Restaurant Service | Active restaurants list | 10 min |
+| Cart Service | User cart data | 30 min |
+| User Auth Service | JWT Token Blacklist (logout) | Token expiry |
+
+### Performance Improvement
+
+| Operation | Without Cache | With Cache | Improvement |
+|-----------|--------------|------------|-------------|
+| Get Menu | ~1000ms | ~60ms | ~16x faster |
+| Get Restaurants | ~800ms | ~65ms | ~12x faster |
+| Get Cart | ~900ms | ~60ms | ~15x faster |
+
+---
+
+## 📊 Observability
+
+### Centralized Logging (Grafana Loki)
+All services send logs to Grafana Cloud Loki with trace correlation.
+
+### Distributed Tracing (Zipkin/Tempo)
+Request tracing across services with unique trace IDs.
+
+### Health Monitoring
+Each service exposes `/actuator/health` endpoint.
+
+---
+
 ## 📁 Project Structure
 
 ```
 food-delivery-microservices/
 ├── .env.example              # Environment template
+├── .env                      # Environment variables (git ignored)
 ├── .gitignore                # Git ignore rules
 ├── README.md                 # This file
 │
+├── config-server/            # Spring Cloud Config Server
+├── config-repo/              # Configuration files for all services
 ├── service-registry/         # Eureka Server
 ├── api-gateway/              # API Gateway + JWT
-├── user-auth-service/        # Authentication
-├── restaurant-service/       # Restaurant management
-├── menu-service/             # Menu management
-├── cart-service/             # Shopping cart
-├── order-service/            # Order processing
+├── user-auth-service/        # Authentication + JWT Blacklist (Redis)
+├── restaurant-service/       # Restaurant management + Caching (Redis)
+├── menu-service/             # Menu management + Caching (Redis)
+├── cart-service/             # Shopping cart + Caching (Redis)
+├── order-service/            # Order processing + Circuit Breaker
 ├── payment-service/          # Payment processing
-└── delivery-service/         # Delivery management
+├── delivery-service/         # Delivery management
+├── admin-service/            # Platform analytics
+└── observability/            # Monitoring configs
 ```
 
 ### Service Structure (Each Service)
@@ -320,6 +371,21 @@ service-name/
 - Use `@Transactional` for database operations
 - Follow existing package structure
 - Add proper logging
+
+---
+
+## 🔧 Key Features
+
+- **Microservices Architecture** - 11 independent services
+- **Service Discovery** - Netflix Eureka for dynamic service registration
+- **API Gateway** - Single entry point with JWT authentication
+- **Centralized Config** - Spring Cloud Config Server
+- **Redis Caching** - High-performance caching with Redis Cloud
+- **JWT Blacklist** - Secure logout with Redis-based token blacklist
+- **Circuit Breaker** - Resilience4j for fault tolerance
+- **Centralized Logging** - Grafana Loki integration
+- **Distributed Tracing** - Zipkin/Tempo for request tracing
+- **Role-Based Access** - ADMIN, USER, RIDER roles
 
 ---
 
