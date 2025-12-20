@@ -13,6 +13,7 @@ services:
     name: food-delivery-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
+    ipAllowList: []  # Allow all Render services
 
   # ==========================================================================
   # INFRASTRUCTURE SERVICES
