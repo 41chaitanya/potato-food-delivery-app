@@ -52,7 +52,7 @@
         <logger name="com.netflix" level="WARN"/>
     </springProfile>
 
-    <springProfile name="docker">
+    <springProfile name="docker,render">
         <root level="INFO">
             <appender-ref ref="JSON_SIMPLE"/>
         </root>

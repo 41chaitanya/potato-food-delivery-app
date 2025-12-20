@@ -73,7 +73,7 @@
     <!-- ========================================================================
          DOCKER PROFILE - JSON output for local Loki via Promtail
          ======================================================================== -->
-    <springProfile name="docker">
+    <springProfile name="docker,render">
         <root level="INFO">
             <appender-ref ref="JSON_SIMPLE"/>
         </root>

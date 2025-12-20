@@ -57,7 +57,7 @@
         <logger name="com.github.loki4j" level="DEBUG"/>
     </springProfile>
 
-    <springProfile name="docker">
+    <springProfile name="docker,render">
         <root level="INFO">
             <appender-ref ref="JSON_SIMPLE"/>
         </root>
