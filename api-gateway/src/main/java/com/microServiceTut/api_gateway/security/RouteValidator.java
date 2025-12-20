@@ -18,6 +18,9 @@ public class RouteValidator {
 
     // Public endpoints - no authentication required
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/validate",
             "/auth/register",
             "/auth/login",
             "/auth/validate",
