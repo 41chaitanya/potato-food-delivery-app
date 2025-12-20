@@ -26,4 +26,4 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT:-8090}/actuator/health || exit 1
 EXPOSE 8090
-ENTRYPOINT ["sh", "-c", "if [ -n \"$SPRING_DATASOURCE_URL\" ]; then JDBC_URL=$(echo $SPRING_DATASOURCE_URL | sed 's|postgres://[^@]*@|jdbc:postgresql://|'); export SPRING_DATASOURCE_URL=$JDBC_URL; fi && java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh", "-c", "if [ -n \"$SPRING_DATASOURCE_URL\" ]; then export SPRING_DATASOURCE_URL=\"jdbc:$(echo $SPRING_DATASOURCE_URL | sed 's|postgres://|postgresql://|' | sed 's|postgresql://[^:]*:[^@]*@|postgresql://|')\"; fi && java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]

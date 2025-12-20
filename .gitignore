@@ -57,4 +57,4 @@ docs/
 # ===========================================
 # Keep .env.docker and .env.example in version control
 !.env.docker
-!.env.example
+!.env.example 
