@@ -38,6 +38,7 @@ public class SecurityConfig {
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
                 // Auth endpoints are public
+                .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 // Actuator health endpoint
                 .requestMatchers("/actuator/**").permitAll()

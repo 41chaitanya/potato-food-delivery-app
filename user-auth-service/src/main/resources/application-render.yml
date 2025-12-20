@@ -3,6 +3,8 @@ server:
   port: ${SERVER_PORT:8081}
 
 spring:
+  application:
+    name: USER-AUTH-SERVICE
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/user_auth_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}

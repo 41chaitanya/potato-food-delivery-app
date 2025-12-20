@@ -3,6 +3,8 @@ server:
   port: ${SERVER_PORT:8089}
 
 spring:
+  application:
+    name: CONFIG-SERVER
   cloud:
     config:
       server:

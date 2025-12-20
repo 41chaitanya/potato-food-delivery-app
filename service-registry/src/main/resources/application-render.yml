@@ -2,6 +2,10 @@
 server:
   port: ${SERVER_PORT:8761}
 
+spring:
+  application:
+    name: SERVICE-REGISTRY
+
 eureka:
   instance:
     hostname: ${RENDER_EXTERNAL_HOSTNAME:localhost}

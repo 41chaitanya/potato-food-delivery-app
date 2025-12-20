@@ -3,6 +3,8 @@ server:
   port: ${SERVER_PORT:8090}
 
 spring:
+  application:
+    name: ADMIN-SERVICE
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/admin_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
