@@ -112,18 +112,10 @@ services:
         value: "8081"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -169,18 +161,10 @@ services:
         value: "8082"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -220,18 +204,10 @@ services:
         value: "8083"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -271,18 +247,10 @@ services:
         value: "8084"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -322,18 +290,10 @@ services:
         value: "8085"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -363,18 +323,10 @@ services:
         value: "8086"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -404,18 +356,10 @@ services:
         value: "8087"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -445,18 +389,10 @@ services:
         value: "8088"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db
@@ -486,18 +422,10 @@ services:
         value: "8090"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: DATABASE_HOST
+      - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: food-delivery-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: food-delivery-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: food-delivery-db
-          property: database
+          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: food-delivery-db

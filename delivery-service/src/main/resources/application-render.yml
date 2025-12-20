@@ -4,9 +4,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:delivery_db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/delivery_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
