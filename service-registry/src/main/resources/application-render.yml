@@ -1,4 +1,4 @@
-# Render deployment profile
+# Render deployment profile - Service Registry (Eureka)
 server:
   port: ${SERVER_PORT:8761}
 
@@ -15,10 +15,16 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://localhost:${server.port}/eureka/
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+  endpoint:
+    health:
+      show-details: always

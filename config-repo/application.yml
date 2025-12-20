@@ -1,11 +1,7 @@
 # ============================================================================
-# SHARED CONFIGURATION - Applied to ALL services
-# ============================================================================
-# This file contains common configuration shared across all microservices.
-# Service-specific configs override these values.
+# SHARED CONFIGURATION - Applied to ALL services (Local Development)
 # ============================================================================
 
-# Common Database Configuration
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -21,21 +17,15 @@ spring:
       ddl-auto: update
     show-sql: false
     open-in-view: false
-    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  sql:
-    init:
-      mode: always
-
   jackson:
     serialization:
       write-dates-as-timestamps: false
 
-# Common Eureka Configuration
 eureka:
   client:
     register-with-eureka: true
@@ -46,34 +36,16 @@ eureka:
     hostname: localhost
     prefer-ip-address: true
 
-# Common Actuator Configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info
   endpoint:
     health:
-      show-details: when_authorized
-      show-components: when_authorized
-  tracing:
-    sampling:
-      probability: ${TRACING_PROBABILITY:0.1}
-  zipkin:
-    tracing:
-      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
+      show-details: always
 
-# Common Logging with TraceId
 logging:
   level:
     root: INFO
     com.microServiceTut: DEBUG
-    org.hibernate.SQL: WARN
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-
-# Grafana Cloud Loki Configuration
-loki:
-  url: ${LOKI_URL:https://logs-prod-028.grafana.net}
-  user: ${LOKI_USER:}
-  password: ${LOKI_PASSWORD:}

@@ -23,7 +23,7 @@ COPY --from=builder /build/target/extracted/application/ ./
 RUN chown -R appuser:appgroup /app
 USER appuser
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -Djava.security.egd=file:/dev/./urandom"
-HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT:-8761}/actuator/health || exit 1
 EXPOSE 8761
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]

@@ -1,4 +1,4 @@
-# Render deployment profile
+# Render deployment profile - Notification Service
 server:
   port: ${SERVER_PORT:8088}
 
@@ -14,27 +14,36 @@ spring:
       maximum-pool-size: 2
       minimum-idle: 1
       connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      group-id: notification-group
-      auto-startup: false
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
 eureka:
   instance:
     hostname: ${RENDER_EXTERNAL_HOSTNAME:localhost}
     prefer-ip-address: false
+    instance-id: ${spring.application.name}:${random.uuid}
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+    registry-fetch-interval-seconds: 5
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+  endpoint:
+    health:
+      show-details: always

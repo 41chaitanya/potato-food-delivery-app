@@ -1,4 +1,4 @@
-# Render deployment profile
+# Render deployment profile - User Auth Service
 server:
   port: ${SERVER_PORT:8081}
 
@@ -14,26 +14,33 @@ spring:
       maximum-pool-size: 2
       minimum-idle: 1
       connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  data:
-    redis:
-      host: ${SPRING_DATA_REDIS_HOST:localhost}
-      port: ${SPRING_DATA_REDIS_PORT:6379}
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
 eureka:
   instance:
     hostname: ${RENDER_EXTERNAL_HOSTNAME:localhost}
     prefer-ip-address: false
+    instance-id: ${spring.application.name}:${random.uuid}
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+    registry-fetch-interval-seconds: 5
 
 jwt:
-  secret: ${JWT_SECRET:defaultSecretKey}
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024}
   expiration: ${JWT_EXPIRATION:86400000}
 
 management:
@@ -41,3 +48,6 @@ management:
     web:
       exposure:
         include: health,info
+  endpoint:
+    health:
+      show-details: always

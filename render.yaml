@@ -1,25 +1,18 @@
 # ============================================================================
 # RENDER BLUEPRINT - Food Delivery Microservices
 # ============================================================================
-# Deploy: Connect GitHub repo to Render → Select Blueprint → Deploy
-# All services will be deployed automatically
+# IMPORTANT NOTES:
+# 1. Render free tier PostgreSQL has ~20 connection limit
+# 2. Each service uses max 2 connections (total ~20 for 10 services)
+# 3. Services may take 2-3 minutes to start on free tier
+# 4. After first deploy, update EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE 
+#    with actual service-registry URL
 # ============================================================================
 
 services:
   # ==========================================================================
-  # REDIS
+  # INFRASTRUCTURE - Service Registry (Eureka) - DEPLOY FIRST
   # ==========================================================================
-  - type: redis
-    name: food-delivery-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []  # Allow all Render services
-
-  # ==========================================================================
-  # INFRASTRUCTURE SERVICES
-  # ==========================================================================
-  
-  # Service Registry (Eureka) - Must start first
   - type: web
     name: service-registry
     runtime: docker
@@ -32,29 +25,9 @@ services:
         value: "8761"
       - key: SPRING_PROFILES_ACTIVE
         value: render
-      - key: EUREKA_CLIENT_REGISTER_WITH_EUREKA
-        value: "false"
-      - key: EUREKA_CLIENT_FETCH_REGISTRY
-        value: "false"
-
-  # Config Server
-  - type: web
-    name: config-server
-    runtime: docker
-    plan: free
-    dockerfilePath: ./config-server/Dockerfile
-    dockerContext: .
-    healthCheckPath: /actuator/health
-    envVars:
-      - key: SERVER_PORT
-        value: "8089"
-      - key: SPRING_PROFILES_ACTIVE
-        value: native,render
-      - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
-      - key: EUREKA_INSTANCE_HOSTNAME
+      - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
-          name: config-server
+          name: service-registry
           type: web
           property: host
 
@@ -74,26 +47,14 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_EXPIRATION
-        value: "86400000"
+        value: "mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024"
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: api-gateway
           type: web
           property: host
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: port
 
   # ==========================================================================
   # BUSINESS SERVICES
@@ -125,28 +86,14 @@ services:
           name: food-delivery-db
           property: password
       - key: JWT_SECRET
-        fromService:
-          name: api-gateway
-          type: web
-          envVarKey: JWT_SECRET
+        value: "mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024"
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: user-auth-service
           type: web
           property: host
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: port
-
 
   # Restaurant Service
   - type: web
@@ -174,22 +121,12 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: restaurant-service
           type: web
           property: host
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: port
 
   # Menu Service
   - type: web
@@ -217,22 +154,12 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: menu-service
           type: web
           property: host
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: port
 
   # Cart Service
   - type: web
@@ -260,22 +187,12 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: cart-service
           type: web
           property: host
-      - key: SPRING_DATA_REDIS_HOST
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: host
-      - key: SPRING_DATA_REDIS_PORT
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: port
 
   # Order Service
   - type: web
@@ -303,7 +220,7 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: order-service
@@ -336,7 +253,7 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: payment-service
@@ -369,7 +286,7 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: delivery-service
@@ -402,7 +319,7 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: notification-service
@@ -435,7 +352,7 @@ services:
           name: food-delivery-db
           property: password
       - key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        value: https://service-registry-33hd.onrender.com/eureka/
+        sync: false
       - key: RENDER_EXTERNAL_HOSTNAME
         fromService:
           name: admin-service

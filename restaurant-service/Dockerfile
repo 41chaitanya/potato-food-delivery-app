@@ -22,8 +22,8 @@ COPY --from=builder /build/target/extracted/snapshot-dependencies/ ./
 COPY --from=builder /build/target/extracted/application/ ./
 RUN chown -R appuser:appgroup /app
 USER appuser
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication -Djava.security.egd=file:/dev/./urandom"
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -Djava.security.egd=file:/dev/./urandom"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT:-8082}/actuator/health || exit 1
 EXPOSE 8082
-ENTRYPOINT ["sh", "-c", "if [ -n \"$SPRING_DATASOURCE_URL\" ]; then export SPRING_DATASOURCE_URL=\"jdbc:$(echo $SPRING_DATASOURCE_URL | sed 's|postgres://|postgresql://|' | sed 's|postgresql://[^:]*:[^@]*@|postgresql://|')\"; fi && java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
