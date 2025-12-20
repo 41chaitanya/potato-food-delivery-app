@@ -7,6 +7,14 @@
 
 services:
   # ==========================================================================
+  # REDIS
+  # ==========================================================================
+  - type: redis
+    name: food-delivery-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+  # ==========================================================================
   # INFRASTRUCTURE SERVICES
   # ==========================================================================
   
@@ -86,11 +94,6 @@ services:
           name: food-delivery-redis
           type: redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: password
 
   # ==========================================================================
   # BUSINESS SERVICES
@@ -141,11 +144,6 @@ services:
           name: food-delivery-redis
           type: redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: password
 
 
   # Restaurant Service
@@ -188,11 +186,6 @@ services:
           name: food-delivery-redis
           type: redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: password
 
   # Menu Service
   - type: web
@@ -234,11 +227,6 @@ services:
           name: food-delivery-redis
           type: redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: password
 
   # Cart Service
   - type: web
@@ -280,11 +268,6 @@ services:
           name: food-delivery-redis
           type: redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          name: food-delivery-redis
-          type: redis
-          property: password
 
   # Order Service
   - type: web
@@ -316,7 +299,6 @@ services:
           name: service-registry
           type: web
           envVarKey: RENDER_EXTERNAL_URL
-
 
   # Payment Service
   - type: web
@@ -450,9 +432,3 @@ databases:
     plan: free
     databaseName: food_delivery
     user: food_delivery_user
-
-# ============================================================================
-# REDIS (defined in services section)
-# ============================================================================
-# Note: Redis is referenced via fromService in other services
-# Render will create it automatically when referenced
