@@ -50,7 +50,7 @@ Thumbs.db
 # ===========================================
 # Documentation (Local Testing Docs)
 # ===========================================
-# docs/  # Keep docs in version control
+docs/
 
 # ===========================================
 # Docker
