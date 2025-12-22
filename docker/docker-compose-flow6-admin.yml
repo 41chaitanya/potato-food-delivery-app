@@ -1,0 +1,106 @@
+version: '3.8'
+
+# ============================================================================
+# FLOW 6: ADMIN (~1.3GB RAM)
+# Services: PostgreSQL, Service Registry, User Auth, Restaurant, Admin
+# Ports: Same as IntelliJ testing
+# ============================================================================
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: food-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-registry:
+    build: ../service-registry
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  user-auth-service:
+    build: ../user-auth-service
+    container_name: user-auth-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - EUREKA_URI=http://service-registry:8761/eureka
+      - JWT_SECRET=mySecretKeyForJWTTokenGenerationWhichShouldBeAtLeast256BitsLongForHS256Algorithm2024
+      - SPRING_CACHE_TYPE=simple
+    depends_on:
+      postgres:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+
+  restaurant-service:
+    build: ../restaurant-service
+    container_name: restaurant-service
+    ports:
+      - "8086:8086"
+    environment:
+      - SERVER_PORT=8086
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - EUREKA_URI=http://service-registry:8761/eureka
+      - SPRING_CACHE_TYPE=simple
+    depends_on:
+      postgres:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+
+  admin-service:
+    build: ../admin-service
+    container_name: admin-service
+    ports:
+      - "8088:8088"
+    environment:
+      - SERVER_PORT=8088
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - EUREKA_URI=http://service-registry:8761/eureka
+      - SPRING_CACHE_TYPE=simple
+    depends_on:
+      postgres:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      user-auth-service:
+        condition: service_started
+      restaurant-service:
+        condition: service_started
+
+networks:
+  default:
+    name: food-network

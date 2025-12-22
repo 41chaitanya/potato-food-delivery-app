@@ -3,7 +3,7 @@
 # ============================================================================
 
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${SERVER_PORT:8086}
 
 spring:
   application:
@@ -28,7 +28,7 @@ spring:
           min-idle: 0
 
   cache:
-    type: redis
+    type: ${CACHE_TYPE:simple}
 
 logging:
   level:

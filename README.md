@@ -388,8 +388,93 @@ service-name/
 - **Redis Caching** - High-performance caching with Redis Cloud
 - **JWT Blacklist** - Secure logout with Redis-based token blacklist
 - **Circuit Breaker** - Resilience4j for fault tolerance
-
 - **Role-Based Access** - ADMIN, USER, RIDER roles
+
+---
+
+## 🐳 Docker Deployment
+
+### Quick Start (Production)
+
+```bash
+# Start all services with Redis, Kafka, PostgreSQL
+docker-compose -f docker/docker-compose-production.yml up -d --build
+
+# Check status
+docker ps
+
+# View logs
+docker-compose -f docker/docker-compose-production.yml logs -f
+
+# Stop all services
+docker-compose -f docker/docker-compose-production.yml down -v
+```
+
+### Flow-Based Testing (Low Memory)
+
+```bash
+# Flow 1: Auth Only (~1GB RAM)
+docker-compose -f docker/docker-compose-flow1-auth.yml up -d --build
+
+# Flow 2: Restaurant & Menu (~1.2GB RAM)
+docker-compose -f docker/docker-compose-flow2-menu.yml up -d --build
+
+# Flow 3: Cart (~1.3GB RAM)
+docker-compose -f docker/docker-compose-flow3-cart.yml up -d --build
+
+# Flow 4: Order & Payment (~1.3GB RAM)
+docker-compose -f docker/docker-compose-flow4-order.yml up -d --build
+
+# Flow 5: Delivery (~1.3GB RAM)
+docker-compose -f docker/docker-compose-flow5-delivery.yml up -d --build
+
+# Flow 6: Admin (~1.3GB RAM)
+docker-compose -f docker/docker-compose-flow6-admin.yml up -d --build
+```
+
+---
+
+## ☁️ Cloud Deployment (Oracle/AWS/GCP)
+
+### Environment Variables for Production
+
+```bash
+# Database
+DB_HOST=<your-cloud-db-host>
+DB_PORT=5432
+DB_USERNAME=<db-user>
+DB_PASSWORD=<secure-password>
+
+# Redis
+REDIS_HOST=<your-redis-host>
+REDIS_PORT=6379
+REDIS_PASSWORD=<redis-password>
+
+# Kafka
+KAFKA_BOOTSTRAP_SERVERS=<your-kafka-endpoint>
+
+# JWT (IMPORTANT: Change this!)
+JWT_SECRET=<your-256-bit-secret-key>
+
+# Payment
+PAYMENT_SUCCESS_RATE=0.95
+```
+
+### Oracle Cloud Infrastructure (OCI)
+
+1. **Database**: Use Oracle Autonomous Database or PostgreSQL on OCI
+2. **Redis**: Use OCI Cache with Redis
+3. **Kafka**: Use OCI Streaming (Kafka compatible)
+4. **Container**: Deploy using OCI Container Instances or OKE
+
+### Deployment Checklist
+
+- [ ] Change `JWT_SECRET` to a secure 256-bit key
+- [ ] Set strong `DB_PASSWORD` and `REDIS_PASSWORD`
+- [ ] Configure proper `PAYMENT_SUCCESS_RATE` (0.95 = 95%)
+- [ ] Enable HTTPS/TLS for all endpoints
+- [ ] Set up proper logging and monitoring
+- [ ] Configure health checks for all services
 
 ---
 

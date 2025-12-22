@@ -289,10 +289,10 @@ services:
         value: "https://service-registry-s4hd.onrender.com/eureka/"
 
 # ============================================================================
-# DATABASE
+# DATABASE (Using existing database)
 # ============================================================================
 databases:
-  - name: food-delivery-db
+  - name: food-delivery-db-s4hd
     plan: free
     databaseName: food_delivery
     user: food_delivery_user

@@ -68,7 +68,15 @@ public class AdminServiceImpl implements AdminService {
     public PlatformAnalyticsResponse getPlatformAnalytics() {
         var userStats = userAuthClient.getUserStats();
         var restaurantStats = restaurantClient.getRestaurantStats();
-        var orderStats = orderClient.getOrderStats();
+        
+        // Try to get order stats, use defaults if order service is down
+        OrderClient.OrderStatsResponse orderStats;
+        try {
+            orderStats = orderClient.getOrderStats();
+        } catch (Exception e) {
+            log.warn("Order service unavailable, using default stats: {}", e.getMessage());
+            orderStats = new OrderClient.OrderStatsResponse(0, 0, 0, 0, 0.0);
+        }
 
         BigDecimal commission = commissionRepo.findByConfigKeyAndActiveTrue("DEFAULT")
                 .map(CommissionConfig::getCommissionPercentage)

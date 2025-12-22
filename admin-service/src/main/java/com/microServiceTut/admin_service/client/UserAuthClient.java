@@ -9,22 +9,22 @@ import java.util.UUID;
 @FeignClient(name = "USER-AUTH-SERVICE")
 public interface UserAuthClient {
 
-    @GetMapping("/auth/admin/users")
+    @GetMapping("/api/auth/admin/users")
     List<UserResponse> getAllUsers();
 
-    @GetMapping("/auth/admin/users/{userId}")
+    @GetMapping("/api/auth/admin/users/{userId}")
     UserResponse getUserById(@PathVariable UUID userId);
 
-    @PatchMapping("/auth/admin/users/{userId}/block")
+    @PatchMapping("/api/auth/admin/users/{userId}/block")
     UserResponse blockUser(@PathVariable UUID userId);
 
-    @PatchMapping("/auth/admin/users/{userId}/unblock")
+    @PatchMapping("/api/auth/admin/users/{userId}/unblock")
     UserResponse unblockUser(@PathVariable UUID userId);
 
-    @GetMapping("/auth/admin/users/role/{role}")
+    @GetMapping("/api/auth/admin/users/role/{role}")
     List<UserResponse> getUsersByRole(@PathVariable String role);
 
-    @GetMapping("/auth/admin/stats")
+    @GetMapping("/api/auth/admin/stats")
     UserStatsResponse getUserStats();
 
     record UserStatsResponse(long totalUsers, long activeUsers, long blockedUsers,

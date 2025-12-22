@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final TokenBlacklistServiceInterface tokenBlacklistService;
 
     @Override
     @Transactional

@@ -15,6 +15,8 @@
         </encoder>
     </appender>
 
+    <!-- LOKI appender - only define when loki4j dependency is present -->
+    <!-- Uncomment and add loki-logback-appender dependency to use Loki logging
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
             <url>${LOKI_URL}/loki/api/v1/push</url>
@@ -33,6 +35,7 @@
             <sortByTime>true</sortByTime>
         </format>
     </appender>
+    -->
 
     <appender name="JSON_SIMPLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -43,18 +46,15 @@
     <springProfile name="default,local,dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOKI"/>
         </root>
         <logger name="com.fooddelivery.notification" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOKI"/>
         </logger>
         <logger name="org.springframework" level="INFO"/>
         <logger name="org.springframework.kafka" level="INFO"/>
         <logger name="org.apache.kafka" level="WARN"/>
         <logger name="org.hibernate" level="WARN"/>
         <logger name="com.netflix" level="WARN"/>
-        <logger name="com.github.loki4j" level="DEBUG"/>
     </springProfile>
 
     <springProfile name="docker,render">
@@ -74,18 +74,15 @@
     <springProfile name="cloud,prod,production">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOKI"/>
         </root>
         <logger name="com.fooddelivery.notification" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOKI"/>
         </logger>
         <logger name="org.springframework" level="INFO"/>
         <logger name="org.springframework.kafka" level="INFO"/>
         <logger name="org.apache.kafka" level="WARN"/>
         <logger name="org.hibernate" level="WARN"/>
         <logger name="com.netflix" level="WARN"/>
-        <logger name="com.github.loki4j" level="DEBUG"/>
     </springProfile>
 
 </configuration>

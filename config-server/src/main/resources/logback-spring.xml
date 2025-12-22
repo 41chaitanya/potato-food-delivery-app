@@ -40,6 +40,11 @@
         </encoder>
     </appender>
 
+    <!-- Default root logger (fallback when no profile matches) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
     <springProfile name="default,local,dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>

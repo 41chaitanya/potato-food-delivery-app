@@ -49,6 +49,13 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- Spring Dotenv - Load .env file -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        
         <!-- Eureka Client - Service Discovery -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

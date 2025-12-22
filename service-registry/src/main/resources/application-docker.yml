@@ -1,0 +1,28 @@
+# Docker profile - Service Registry
+server:
+  port: ${SERVER_PORT:8761}
+
+spring:
+  application:
+    name: SERVICE-REGISTRY
+
+eureka:
+  instance:
+    hostname: service-registry
+    prefer-ip-address: false
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:${server.port}/eureka/
+  server:
+    enable-self-preservation: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

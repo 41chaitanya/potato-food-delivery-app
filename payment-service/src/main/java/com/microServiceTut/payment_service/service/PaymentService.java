@@ -8,6 +8,7 @@ import com.microServiceTut.payment_service.model.PaymentStatus;
 import com.microServiceTut.payment_service.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,9 @@ import java.util.UUID;
 public class PaymentService {
     
     private final PaymentRepository paymentRepository;
+    
+    @Value("${payment.gateway.success-rate:0.95}")
+    private double successRate;
 
     public PaymentResponse processPayment(PaymentRequest paymentRequest) {
         log.info("Processing payment for orderId: {}, amount: {}", 
@@ -52,10 +56,12 @@ public class PaymentService {
     }
 
     /**
-     * Simulates payment gateway - 70% success rate
+     * Simulates payment gateway with configurable success rate.
+     * Default: 95% success rate (production realistic)
+     * Set PAYMENT_SUCCESS_RATE=1.0 for 100% success (testing)
      */
     private boolean simulatePaymentGateway() {
-        return Math.random() > 0.3;
+        return Math.random() < successRate;
     }
 
     public PaymentResponse getPaymentByOrderId(UUID orderId) {
